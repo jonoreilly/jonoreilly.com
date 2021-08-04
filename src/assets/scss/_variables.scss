@@ -1,0 +1,37 @@
+$font-color: #112;
+$font-weak-color: #889;
+$font-weak-color2: #3c3cff;
+$font-family: Arial;
+$white: white;
+$white-1: #f1f1f1;
+$white-2: #d6d6d6;
+$white-3: #aaaaaa;
+$green: #18ffb4;
+$green-1: #dafff3;
+$green-2: #f0fffa;
+$blue: #00d7ff;
+$blue-1: #b4f3ff;
+$blue-2: #e3fbff;
+$dark-blue: #0053ff;
+$elevation-1: drop-shadow(0 3px 3px #0001);
+$elevation-2: drop-shadow(0 5px 5px #0004);
+$elevation-3: drop-shadow(0 5px 8px #000a);
+$app-height: 100vh;
+$section-height: 100vh;
+$banner-height: 200px;
+$size-medium: 1300px;
+$size-small: 800px;
+$z-index-highest: 100;
+$z-index-lowest: 1;
+$z-index-middle: 10;
+$font-size-huge: 70px;
+$font-size-less-huge: 50px;
+$font-size-title: 40px;
+$font-size-sub-title: 20px;
+$font-size-sub-title-zoomed: 22px;
+$font-size-normal: 16px;
+$font-size-normal-zoomed: 17px;
+
+@media (max-width: 800px) {
+  $section-height: 95vh;
+}

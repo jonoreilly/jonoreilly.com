@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WebGL project</title>
+  <script src="./js/gl-matrix.js"></script>
+  <script src="./js/webgl.js"></script>
+  <style>
+    section {
+      border: 3px solid #E5E5E5;
+      text-align: center;
+      min-height: 97vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 0 2rem;
+    }
+
+    header,
+    footer {
+      padding: .5rem 2rem;
+    }
+
+    .controls {
+      text-align: left;
+      justify-items: center;
+      display: grid;
+    }
+  </style>
+</head>
+
+<body>
+  <section>
+    <header>
+      <h1>
+        This is my WebGL project
+      </h1>
+      <p>
+        By Stefan Tabakovski
+      </p>
+      <input type="file" id="obj-file">
+    </header>
+    <div>
+      <canvas id="webgl-canvas" width="800" height="600">
+        Your browser does not support HTML5 canvas
+      </canvas>
+    </div>
+    <footer>
+      <h2 style="margin: 0px;">Controls:</h2>
+      <div class="controls">
+        <ul>
+          <li>Arrow keys to move</li>
+          <li>To rotate:
+            <ul>
+              <li>W/S for Y axis</li>
+              <li>A/D for X axis</li>
+              <li>Q/E for Z axis</li>
+            </ul>
+          </li>
+          <li>I/O to scale</li>
+        </ul>
+      </div>
+    </footer>
+  </section>
+</body>
+
+</html>
