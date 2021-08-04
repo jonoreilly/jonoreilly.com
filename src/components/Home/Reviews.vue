@@ -61,10 +61,6 @@ export default defineComponent({
   padding-bottom: 10px;
 }
 
-#reviews .review-stars {
-  filter: invert(1) sepia(1) saturate(255) hue-rotate(-31deg);
-}
-
 #reviews .content-bottom {
   align-self: end;
   text-align: right;
