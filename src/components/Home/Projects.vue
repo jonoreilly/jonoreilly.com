@@ -1,5 +1,5 @@
 <template>
-  <div class="section card-section" id="personal-projects">
+  <div class="section card-section projects">
     <div class="section-title">Personal Projects</div>
     <div class="content-overflow">
       <div class="content-container">
@@ -17,8 +17,13 @@
             <div class="content-body">{{ project.body }}</div>
             <div class="content-bottom">
               <template v-if="project.demo">
-                <a :href="project.demo" target="_blank" tooltip="Go to Demo">
-                  <span class="demo-link">Demo</span>
+                <a
+                  :href="project.demo"
+                  target="_blank"
+                  tooltip="Go to Demo"
+                  class="demo-link"
+                >
+                  Demo
                 </a>
               </template>
               <div class="tech-stack">
@@ -56,56 +61,58 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/scss/_card-section.scss";
 
-#personal-projects {
+.projects {
   background-color: $white-1;
 }
 
-#personal-projects a {
-  text-decoration: none;
-}
+.card-section {
+  .content-card {
+    grid-template-rows: 190px auto auto minmax(auto, 1fr);
+  }
 
-#personal-projects .content-card {
-  grid-template-rows: 190px auto auto minmax(auto, 1fr);
-}
+  .content-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 
-#personal-projects .content-picture {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+  .content-bottom {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-self: end;
+  }
 
-#personal-projects .content-bottom {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-self: end;
-}
+  .demo-link {
+    text-decoration: none;
+    color: $font-weak-color;
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
 
-#personal-projects .demo-link {
-  color: $font-weak-color;
-  border-radius: 4px;
-  padding: 4px 8px;
-}
+  .content-card {
+    &:hover {
+      .demo-link {
+        background-color: $white-2;
+        color: black;
+      }
+    }
+    .demo-link:hover {
+      color: $white;
+      background-color: $white-3;
+    }
+  }
 
-#personal-projects .content-card:hover .demo-link {
-  background-color: $white-2;
-  color: black;
-}
+  .tech-stack {
+    grid-column: 2;
+    text-align: right;
+    color: $font-weak-color;
+  }
 
-#personal-projects .content-card:hover .demo-link:hover {
-  color: $white;
-  background-color: $white-3;
-}
-
-#personal-projects .tech-stack {
-  grid-column: 2;
-  text-align: right;
-  color: $font-weak-color;
-}
-
-@media (max-width: 800px) {
-  #personal-projects .demo-link {
-    background-color: $white-2;
-    color: black;
+  @media (max-width: 800px) {
+    .demo-link {
+      background-color: $white-2;
+      color: black;
+    }
   }
 }
 </style>

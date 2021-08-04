@@ -1,5 +1,5 @@
 <template>
-  <div class="section card-section" id="reviews">
+  <div class="section card-section reviews">
     <div class="section-title">Reviews</div>
     <div class="content-overflow">
       <div class="content-container">
@@ -15,7 +15,11 @@
               <Stars :rating="stars" />
             </div>
             <div class="content-body">{{ body }}</div>
-            <div class="content-bottom">{{ signature }}</div>
+            <div class="content-bottom">
+              <a :href="signature.contact" class="signature">
+                {{ signature.name }}
+              </a>
+            </div>
           </div>
         </template>
       </div>
@@ -43,34 +47,52 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/scss/_card-section.scss";
 
-#reviews {
+.reviews {
   background-color: $white;
 }
 
-#reviews .content-card {
-  border: 2px solid $white-2;
-  flex: 0 0 600px;
-}
+.card-section {
+  .content-card {
+    border: 2px solid $white-2;
+    flex: 0 0 600px;
 
-#reviews .content-top {
-  display: grid;
-  grid-template-columns: 1fr auto;
-}
+    .content-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
 
-#reviews .review-title {
-  padding-bottom: 10px;
-}
+      @media (max-width: 800px) {
+        grid-template-columns: unset;
+        grid-template-rows: 1fr auto;
+      }
 
-#reviews .content-bottom {
-  align-self: end;
-  text-align: right;
-  color: $font-weak-color;
-}
+      .review-title {
+        padding-bottom: 10px;
+      }
+    }
 
-@media (max-width: 800px) {
-  #reviews .content-top {
-    grid-template-columns: unset;
-    grid-template-rows: 1fr auto;
+    .content-bottom {
+      align-self: end;
+      text-align: right;
+
+      .signature {
+        color: $font-weak-color;
+        text-decoration: none;
+
+        @media (max-width: 800px) {
+          color: black;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &:hover {
+      .content-bottom {
+        .signature {
+          color: black;
+          text-decoration: underline;
+        }
+      }
+    }
   }
 }
 </style>
