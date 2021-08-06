@@ -30,7 +30,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Stars from "./Stars.vue";
-import { reviews } from "@/utils/reviews";
+import { reviews } from "@/utils/home/reviews";
 
 export default defineComponent({
   components: {

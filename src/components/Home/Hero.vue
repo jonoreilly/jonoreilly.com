@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { contacts } from "@/utils/contacts";
+import { contacts } from "@/utils/home/contacts";
 
 export default defineComponent({
   data() {
@@ -55,13 +55,13 @@ export default defineComponent({
 
 @media (min-aspect-ratio: 1/1) {
   #presentation::before {
-    background-image: url("../../assets/Home/fotos/modelo-panoramic.jpeg");
+    background-image: url("../../assets/home/fotos/modelo-panoramic.jpeg");
   }
 }
 
 @media (max-aspect-ratio: 1/1) {
   #presentation::before {
-    background-image: url("../../assets/Home/fotos/modelo_low-res.jpeg");
+    background-image: url("../../assets/home/fotos/modelo_low-res.jpeg");
   }
 }
 

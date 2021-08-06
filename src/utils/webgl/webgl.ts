@@ -1,30 +1,93 @@
-// const webgl = (function () {
-// -----------------------------------------------------------------------
-// Variables -----------------------=-------------------------------------
-// -----------------------------------------------------------------------
+export type RGB = { red: number; green: number; blue: number };
 
-var material = {};
-var vertices = [];
-var indices = [];
-var lights = [];
+export type Material =
+  | {
+      ambient: RGB;
+      diffuse: RGB;
+      specular: RGB;
+      shininess: number;
+    }
+  | Record<string, never>;
 
-const matrices = {
-  world: null,
-  view: null,
-  perspective: null,
+export type Position2d = {
+  x: number;
+  y: number;
 };
 
-var canvas, context;
-const renderer = {
+export type Position3d = Position2d & {
+  z: number;
+};
+
+export type Projection = {
+  position: Position2d;
+  color: RGB;
+  distance: number;
+};
+
+export type Array4<T> = [T, T, T, T];
+export type Row = Array4<number>;
+export type Matrix = Array4<Row>;
+export type RowMatrix = [Row];
+export type ColumnMatrix = Array4<[number]>;
+export type Matrices =
+  | {
+      world: Matrix;
+      view: Matrix;
+      perspective: Matrix;
+    }
+  | Record<string, never>;
+
+export type Vertex = {
+  position: Position3d;
+  normal: Position3d;
+};
+
+export type Light = {
+  position: Position3d;
+  color: RGB;
+};
+
+export type Renderer = {
+  isRendering: boolean;
+  shouldRender: boolean;
+};
+
+export type Keypress = {
+  speed: number;
+  intervals: Record<string, number>;
+  delay: number;
+};
+
+export type Camera = Position3d & {
+  fov: number;
+  near: number;
+  far: number;
+};
+
+export type Face = [number, number, number];
+
+let material: Material = {};
+let vertices: Vertex[] = [];
+let indices: Face[] = [];
+let lights: Light[] = [];
+
+const matrices: Matrices = {};
+
+let canvas: HTMLCanvasElement;
+let context: CanvasRenderingContext2D;
+
+const renderer: Renderer = {
   isRendering: false,
   shouldRender: true,
 };
-const keypress = {
+
+const keypress: Keypress = {
   speed: 0.01,
   intervals: {},
   delay: 10,
 };
-const camera = {
+
+const camera: Camera = {
   x: 0,
   y: 0,
   z: -8,
@@ -32,15 +95,16 @@ const camera = {
   near: 0.1,
   far: 100,
 };
-const backgroundColor = '#333';
+
+const backgroundColor = "#333";
 
 // -----------------------------------------------------------------------
 // Render ----------------------------------------------------------------
 // -----------------------------------------------------------------------
 
 function setupCanvas() {
-  canvas = document.getElementById('webgl-canvas');
-  context = canvas.getContext('2d');
+  canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement;
+  context = canvas.getContext("2d") as CanvasRenderingContext2D;
   setCanvasValues();
   render();
 }
@@ -71,42 +135,61 @@ function renderCycle() {
   }
 }
 
-function calculatePositions() {
-  const light3dPositions = lights.map(({ position: { x, y, z }, color }) => {
-    const lightRespectToCamera = mat4Mult([[x, y, z, 1]], matrices.view);
-    return {
-      position: {
-        x: lightRespectToCamera[0][0],
-        y: lightRespectToCamera[0][1],
-        z: lightRespectToCamera[0][2],
-      },
-      color,
-    };
-  });
-  const lightPositions = light3dPositions.map(({ position: { x, y, z }, color }) => {
-    const positionInProyectionPlane = mat4Mult([[x, y, z, 1]], matrices.perspective);
-    const positionInCanvas = mapTo2d(positionInProyectionPlane[0]);
-    return {
-      position: positionInCanvas,
-      color: {
-        red: color.red * 255,
-        green: color.green * 255,
-        blue: color.blue * 255,
-      },
-      distance: positionInProyectionPlane[0][2],
-    };
-  });
+function calculatePositions(): {
+  positions: Projection[];
+  lights: Projection[];
+} {
+  const light3dPositions = lights.map<Light>(
+    ({ position: { x, y, z }, color }) => {
+      const lightRespectToCamera = mat4Mult([[x, y, z, 1]], matrices.view);
+      return {
+        position: {
+          x: lightRespectToCamera[0][0],
+          y: lightRespectToCamera[0][1],
+          z: lightRespectToCamera[0][2],
+        },
+        color,
+      };
+    }
+  );
+  const lightPositions = light3dPositions.map(
+    ({ position: { x, y, z }, color }) => {
+      const positionInProyectionPlane = mat4Mult(
+        [[x, y, z, 1]],
+        matrices.perspective
+      );
+      const positionInCanvas = mapTo2d(positionInProyectionPlane[0]);
+      return {
+        position: positionInCanvas,
+        color: {
+          red: color.red * 255,
+          green: color.green * 255,
+          blue: color.blue * 255,
+        },
+        distance: positionInProyectionPlane[0][2],
+      };
+    }
+  );
 
   const positions = vertices.map(({ position: { x, y, z }, normal }) => {
     // calculate 3d vertex position
-    const vertexMat = [[x, y, z, 1]];
+    const vertexMat: [Row] = [[x, y, z, 1]];
     const positionRespectToSelf = mat4Mult(vertexMat, matrices.world);
-    const positionRespectToCamera = mat4Mult(positionRespectToSelf, matrices.view);
+    const positionRespectToCamera = mat4Mult(
+      positionRespectToSelf,
+      matrices.view
+    );
     // calculate 2d vertex proyection
-    const positionInProyectionPlane = mat4Mult(positionRespectToCamera, matrices.perspective);
+    const positionInProyectionPlane = mat4Mult(
+      positionRespectToCamera,
+      matrices.perspective
+    );
     const positionInCanvas = mapTo2d(positionInProyectionPlane[0]);
     // apply rotations to normal
-    const [[nx, ny, nz]] = mat4Mult([[normal.x, normal.y, normal.z, 1]], matrices.world);
+    const [[nx, ny, nz]] = mat4Mult(
+      [[normal.x, normal.y, normal.z, 1]],
+      matrices.world
+    );
     // calculate vertex color
     const color = calculateColor(
       positionRespectToCamera,
@@ -126,7 +209,7 @@ function calculatePositions() {
   };
 }
 
-function mapTo2d(position) {
+function mapTo2d(position: Row): Position2d {
   const zoom = canvas.width / 4;
   return {
     x: (position[0] / Math.abs(position[2])) * zoom + canvas.width / 2,
@@ -134,15 +217,19 @@ function mapTo2d(position) {
   };
 }
 
-function calculateColor(positionMat, normal, light3dPositions) {
-  const position = {
+function calculateColor(
+  positionMat: RowMatrix,
+  normal: Position3d,
+  light3dPositions: Light[]
+): RGB {
+  const position: Position3d = {
     x: positionMat[0][0],
     y: positionMat[0][1],
     z: positionMat[0][2],
   };
   const toCamera = distance(position, camera);
   const ambientLight = calculateAmbientLight();
-  const cumulativeColor = light3dPositions.reduce(
+  const cumulativeColor = light3dPositions.reduce<RGB>(
     (acc, cur) => {
       const toLight = distance(position, cur.position);
       const diffuseFactor = dot(normalize(toLight), normalize(normal));
@@ -160,15 +247,18 @@ function calculateColor(positionMat, normal, light3dPositions) {
           red:
             acc.red +
             cur.color.red *
-              (material.diffuse.red * diffuseFactor + material.specular.red * specularFactor),
+              (material.diffuse.red * diffuseFactor +
+                material.specular.red * specularFactor),
           green:
             acc.green +
             cur.color.green *
-              (material.diffuse.green * diffuseFactor + material.specular.green * specularFactor),
+              (material.diffuse.green * diffuseFactor +
+                material.specular.green * specularFactor),
           blue:
             acc.blue +
             cur.color.blue *
-              (material.diffuse.blue * diffuseFactor + material.specular.blue * specularFactor),
+              (material.diffuse.blue * diffuseFactor +
+                material.specular.blue * specularFactor),
         };
       } else {
         return acc;
@@ -180,16 +270,15 @@ function calculateColor(positionMat, normal, light3dPositions) {
       blue: ambientLight.blue * material.ambient.blue,
     }
   );
-  const color = {
+  return {
     red: cumulativeColor.red * (1.0 / lights.length) * 255,
     green: cumulativeColor.green * (1.0 / lights.length) * 255,
     blue: cumulativeColor.blue * (1.0 / lights.length) * 255,
   };
-  return color;
 }
 
-function calculateAmbientLight() {
-  const sumLights = lights.reduce(
+function calculateAmbientLight(): RGB {
+  const sumLights = lights.reduce<RGB>(
     (acc, cur) => {
       return {
         red: acc.red + cur.color.red,
@@ -206,7 +295,7 @@ function calculateAmbientLight() {
   };
 }
 
-function normalize(v) {
+function normalize(v: Position3d): Position3d {
   const magnitude = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
   return {
     x: v.x * (1.0 / magnitude),
@@ -215,7 +304,7 @@ function normalize(v) {
   };
 }
 
-function distance(a, b) {
+function distance(a: Position3d, b: Position3d): Position3d {
   return {
     x: b.x - a.x,
     y: b.y - a.y,
@@ -223,11 +312,11 @@ function distance(a, b) {
   };
 }
 
-function dot(a, b) {
+function dot(a: Position3d, b: Position3d) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-function scalarMult(v, s) {
+function scalarMult(v: Position3d, s: number): Position3d {
   return {
     x: v.x * s,
     y: v.y * s,
@@ -235,19 +324,25 @@ function scalarMult(v, s) {
   };
 }
 
-function draw(positions, lights) {
+function draw(positions: Projection[], lights: Projection[]) {
   drawFlatShading(positions, lights);
   // drawPhong(positions, lights);
 }
 
-function drawFlatShading(positions, lights) {
-  console.log('draw Flat Shading');
+function drawFlatShading(positions: Projection[], lights: Projection[]) {
+  console.log("draw Flat Shading");
   context.fillStyle = backgroundColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
   for (const light of lights) {
     context.fillStyle = colorCode(light);
     context.beginPath();
-    context.arc(light.position.x, light.position.y, 300 / (light.distance + 5), 0, 2 * Math.PI);
+    context.arc(
+      light.position.x,
+      light.position.y,
+      300 / (light.distance + 5),
+      0,
+      2 * Math.PI
+    );
     context.fill();
   }
   const measuredIndices = indices.map((i) => {
@@ -283,14 +378,20 @@ function drawFlatShading(positions, lights) {
   }
 }
 
-function drawPhong(positions, lights) {
-  console.log('draw Phong');
+function drawPhong(positions: Projection[], lights: Projection[]) {
+  console.log("draw Phong");
   context.fillStyle = backgroundColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
   for (const light of lights) {
     context.fillStyle = colorCode(light);
     context.beginPath();
-    context.arc(light.position.x, light.position.y, Math.abs(10 / light.distance), 0, 2 * Math.PI);
+    context.arc(
+      light.position.x,
+      light.position.y,
+      Math.abs(10 / light.distance),
+      0,
+      2 * Math.PI
+    );
     context.fill();
   }
   for (const index of indices) {
@@ -304,7 +405,7 @@ function drawPhong(positions, lights) {
   }
 }
 
-function drawLine(a, b) {
+function drawLine(a: Projection, b: Projection) {
   context.strokeStyle = createGradient(a, b);
   context.beginPath();
   context.moveTo(a.position.x, a.position.y);
@@ -312,7 +413,7 @@ function drawLine(a, b) {
   context.stroke();
 }
 
-function createGradient(a, b) {
+function createGradient(a: Projection, b: Projection) {
   const gradient = context.createLinearGradient(
     a.position.x,
     a.position.y,
@@ -324,8 +425,8 @@ function createGradient(a, b) {
   return gradient;
 }
 
-function colorCode({ color }) {
-  return `rgba(${color.red}, ${color.green}, ${color.blue}, 1)`;
+function colorCode({ color: { red, green, blue } }: { color: RGB }) {
+  return `rgba(${red}, ${green}, ${blue}, 1)`;
 }
 
 // -----------------------------------------------------------------------
@@ -333,7 +434,7 @@ function colorCode({ color }) {
 // -----------------------------------------------------------------------
 
 function setKeyPressListeners() {
-  window.addEventListener('keydown', function (e) {
+  window.addEventListener("keydown", function (e) {
     if (!e.repeat) {
       clearInterval(keypress.intervals[e.key]);
       keypress.intervals[e.key] = setInterval(function () {
@@ -341,47 +442,47 @@ function setKeyPressListeners() {
       }, keypress.delay);
     }
   });
-  window.addEventListener('keyup', function (e) {
+  window.addEventListener("keyup", function (e) {
     clearInterval(keypress.intervals[e.key]);
   });
 }
 
-function onKeyPress(e) {
+function onKeyPress(e: KeyboardEvent) {
   switch (e.key) {
-    case 'w':
+    case "w":
       doRotateX(-keypress.speed);
       break;
-    case 's':
+    case "s":
       doRotateX(keypress.speed);
       break;
-    case 'a':
+    case "a":
       doRotateY(keypress.speed);
       break;
-    case 'd':
+    case "d":
       doRotateY(-keypress.speed);
       break;
-    case 'q':
+    case "q":
       doRotateZ(keypress.speed);
       break;
-    case 'e':
+    case "e":
       doRotateZ(-keypress.speed);
       break;
-    case 'ArrowUp':
+    case "ArrowUp":
       doTranslateY(keypress.speed * 2);
       break;
-    case 'ArrowDown':
+    case "ArrowDown":
       doTranslateY(-keypress.speed * 2);
       break;
-    case 'ArrowLeft':
+    case "ArrowLeft":
       doTranslateX(-keypress.speed * 2);
       break;
-    case 'ArrowRight':
+    case "ArrowRight":
       doTranslateX(keypress.speed * 2);
       break;
-    case 'i':
+    case "i":
       doScale(1 + keypress.speed);
       break;
-    case 'o':
+    case "o":
       doScale(1 - keypress.speed);
       break;
     default:
@@ -390,55 +491,59 @@ function onKeyPress(e) {
   render();
 }
 
-function doRotateX(speed) {
+function doRotateX(speed: number) {
   matrices.world = mat4Mult(matrices.world, rotateX(speed));
 }
 
-function doRotateY(speed) {
+function doRotateY(speed: number) {
   matrices.world = mat4Mult(matrices.world, rotateY(speed));
 }
 
-function doRotateZ(speed) {
+function doRotateZ(speed: number) {
   matrices.world = mat4Mult(matrices.world, rotateZ(speed));
 }
 
-function doTranslateX(speed) {
+function doTranslateX(speed: number) {
   matrices.view = mat4Mult(matrices.view, translate(speed, 0, 0));
 }
 
-function doTranslateY(speed) {
+function doTranslateY(speed: number) {
   matrices.view = mat4Mult(matrices.view, translate(0, speed, 0));
 }
 
-function doScale(speed) {
+function doScale(speed: number) {
   matrices.world = mat4Mult(matrices.world, scale(speed, speed, speed));
 }
 
 // -----------------------------------------------------------------------
 // Assignment functions --------------------------------------------------
 // -----------------------------------------------------------------------
-
-function mat4Mult(a, b) {
+function mat4Mult(a: Matrix, b: Matrix): Matrix;
+function mat4Mult(a: Matrix, b: RowMatrix): Matrix;
+function mat4Mult(a: Matrix, b: ColumnMatrix): ColumnMatrix;
+function mat4Mult(a: RowMatrix, b: Matrix): RowMatrix;
+function mat4Mult(a: ColumnMatrix, b: Matrix): Matrix;
+function mat4Mult(a: RowMatrix, b: ColumnMatrix): [[number]];
+function mat4Mult(a: number[][], b: number[][]): number[][] {
   if (a?.[0]?.length !== b?.length) {
     console.log(a, b);
-    throw new Error('This matrices cannot be multiplied');
+    throw new Error("This matrices cannot be multiplied");
   }
-  const matrix = [];
-  for (let i = 0; i < a.length; i++) {
-    const row = [];
-    for (let j = 0; j < b[0].length; j++) {
-      let accomulator = 0;
-      for (let k = 0; k < b.length; k++) {
-        accomulator += a[i][k] * b[k][j];
-      }
-      row.push(accomulator);
-    }
-    matrix.push(row);
-  }
+  const matrix = a.reduce<number[][]>((acc, cur, i) => {
+    const row = b[0].reduce<number[]>((acc2, cur2, j) => {
+      const value = b.reduce<number>((acc3, cur3, k) => {
+        return acc3 + a[i][k] * b[k][j];
+      }, 0);
+      acc2.push(value);
+      return acc2;
+    }, []);
+    acc.push(row);
+    return acc;
+  }, []);
   return matrix;
 }
 
-function rotateX(alpha) {
+function rotateX(alpha: number): Matrix {
   const sin = Math.sin(alpha);
   const cos = Math.cos(alpha);
   return [
@@ -449,7 +554,7 @@ function rotateX(alpha) {
   ];
 }
 
-function rotateY(alpha) {
+function rotateY(alpha: number): Matrix {
   const sin = Math.sin(alpha);
   const cos = Math.cos(alpha);
   return [
@@ -460,7 +565,7 @@ function rotateY(alpha) {
   ];
 }
 
-function rotateZ(alpha) {
+function rotateZ(alpha: number): Matrix {
   const sin = Math.sin(alpha);
   const cos = Math.cos(alpha);
   return [
@@ -470,7 +575,7 @@ function rotateZ(alpha) {
     [0, 0, 0, 1],
   ];
 }
-function translate(dx, dy, dz) {
+function translate(dx: number, dy: number, dz: number): Matrix {
   return [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
@@ -479,7 +584,7 @@ function translate(dx, dy, dz) {
   ];
 }
 
-function scale(sx, sy, sz) {
+function scale(sx: number, sy: number, sz: number): Matrix {
   return [
     [sx, 0, 0, 0],
     [0, sy, 0, 0],
@@ -494,7 +599,7 @@ function scale(sx, sy, sz) {
 // a = -f/(f-n)
 // b = -(f*n)/(f-n)
 
-function perspective(fov, near, far) {
+function perspective(fov: number, near: number, far: number): Matrix {
   const s = 1.0 / Math.tan((fov / 2.0) * (Math.PI / 180.0));
   const a = -far / (far - near);
   const b = -(far * near) / (far - near);
@@ -506,7 +611,7 @@ function perspective(fov, near, far) {
   ];
 }
 
-function identity() {
+function identity(): Matrix {
   return [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
@@ -515,7 +620,7 @@ function identity() {
   ];
 }
 
-function view(px, py, pz) {
+function view(px: number, py: number, pz: number): Matrix {
   return [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
@@ -528,40 +633,52 @@ function view(px, py, pz) {
 // File input ------------------------------------------------------------
 // -----------------------------------------------------------------------
 
-function setupFileInput() {
-  const fileInput = document.getElementById('obj-file');
-  fileInput.onchange = function () {
-    const selectedFile = fileInput.files[0];
-    if (selectedFile.name.match(/.?\.obj/) === null) {
-      alert('This file type is not supported');
-      return;
-    }
+function readFile(selectedFile: File): Promise<string> {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function () {
-      parseObjFile(reader.result);
+      const result = reader.result as string;
+      resolve(result);
     };
     reader.onerror = function () {
-      console.error(reader.error);
-      alert('Error reading file');
+      reject(reader.error);
     };
     reader.readAsText(selectedFile);
+  });
+}
+
+function setupFileInput() {
+  const fileInput = document.getElementById("obj-file") as HTMLInputElement;
+  fileInput.onchange = async function () {
+    const selectedFile = fileInput.files?.[0];
+    if (!selectedFile?.name?.endsWith(".obj")) {
+      alert("This file type is not supported");
+      return;
+    }
+    try {
+      const fileContent = await readFile(selectedFile);
+      parseObjFile(fileContent);
+    } catch (error) {
+      console.error(error);
+      alert("Error reading file");
+    }
   };
 }
 
-function parseObjFile(file) {
-  var newMaterial = {};
-  const newVertices = [];
-  const newIndices = [];
-  const newLights = [];
+function parseObjFile(file: string) {
+  let newMaterial: Material = {};
+  const newVertices: Vertex[] = [];
+  const newIndices: Face[] = [];
+  const newLights: Light[] = [];
   // parse file
-  const rows = file.split('\n');
+  const rows = file.split("\n");
   for (const row of rows) {
-    const columns = row.split(' ');
+    const columns = row.split(" ");
     if (columns.length) {
       const rowType = columns[0].toUpperCase();
-      const values = columns.slice(1).map((v) => parseFloat(v));
+      const values = columns.slice(1).map((v: string) => parseFloat(v));
       switch (rowType) {
-        case 'M':
+        case "M":
           newMaterial = {
             ambient: { red: values[0], green: values[1], blue: values[2] },
             diffuse: { red: values[3], green: values[4], blue: values[5] },
@@ -569,16 +686,16 @@ function parseObjFile(file) {
             shininess: values[9],
           };
           break;
-        case 'V':
+        case "V":
           newVertices.push({
             position: { x: values[0], y: values[1], z: values[2] },
             normal: { x: values[3], y: values[4], z: values[5] },
           });
           break;
-        case 'F':
-          newIndices.push(values);
+        case "F":
+          newIndices.push([values[0], values[1], values[2]]);
           break;
-        case 'L':
+        case "L":
           newLights.push({
             position: { x: values[0], y: values[1], z: values[2] },
             color: { red: values[3], green: values[4], blue: values[5] },
@@ -588,7 +705,7 @@ function parseObjFile(file) {
     }
   }
   // center object
-  const offsetTotal = newVertices.reduce(
+  const offsetTotal = newVertices.reduce<Position3d>(
     (acc, cur) => {
       return {
         x: acc.x + cur.position.x,
@@ -598,12 +715,12 @@ function parseObjFile(file) {
     },
     { x: 0, y: 0, z: 0 }
   );
-  const offsetAverage = {
+  const offsetAverage: Position3d = {
     x: offsetTotal.x * (1.0 / newVertices.length),
     y: offsetTotal.y * (1.0 / newVertices.length),
     z: offsetTotal.z * (1.0 / newVertices.length),
   };
-  const centeredVertices = newVertices.map((v) => {
+  const centeredVertices = newVertices.map<Vertex>((v) => {
     return {
       position: {
         x: v.position.x - offsetAverage.x,
@@ -613,7 +730,7 @@ function parseObjFile(file) {
       normal: v.normal,
     };
   });
-  const centeredLights = newLights.map((l) => {
+  const centeredLights = newLights.map<Light>((l) => {
     return {
       position: {
         x: l.position.x - offsetAverage.x,
@@ -635,7 +752,7 @@ function parseObjFile(file) {
 // Initialization --------------------------------------------------------
 // -----------------------------------------------------------------------
 
-function init() {
+async function init() {
   setupMatrices();
   setupFileInput();
   setKeyPressListeners();
@@ -644,10 +761,9 @@ function init() {
 }
 
 async function loadCube() {
-  const response = await fetch('./obj/lightedCube.obj');
+  const response = await fetch("./obj/lightedCube.obj");
   const file = await response.text();
   parseObjFile(file);
 }
 
-window.addEventListener('load', init);
 // })();

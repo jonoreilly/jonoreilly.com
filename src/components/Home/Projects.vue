@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { projects } from "@/utils/projects";
+import { projects } from "@/utils/home/projects";
 
 export default defineComponent({
   data() {

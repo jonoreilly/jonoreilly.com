@@ -9,10 +9,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Hero from "@/components/Home/Hero.vue";
-import Projects from "@/components/Home/Projects.vue";
-import Reviews from "@/components/Home/Reviews.vue";
-import Footer from "@/components/Home/Footer.vue";
+import Hero from "@/components/home/Hero.vue";
+import Projects from "@/components/home/Projects.vue";
+import Reviews from "@/components/home/Reviews.vue";
+import Footer from "@/components/home/Footer.vue";
 
 export default defineComponent({
   components: {

@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { contacts } from "../../utils/contacts";
+import { contacts } from "../../utils/home/contacts";
 
 export default defineComponent({
   data() {
