@@ -9,7 +9,7 @@
               loading="lazy"
               class="content-picture"
               :src="
-                require('@/assets/Home/projects/' + project.picture.filename)
+                require('@/assets/home/projects/' + project.picture.filename)
               "
               :style="'object-fit: ' + project.picture.objectFit"
             />

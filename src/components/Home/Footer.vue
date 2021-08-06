@@ -9,7 +9,7 @@
         <a class="contact-link" :title="tooltip" :href="link" target="_blank">
           <div class="contact-body">
             <img
-              :src="require('@/assets/Home/fa/' + icon + '.svg')"
+              :src="require('@/assets/home/fa/' + icon + '.svg')"
               width="40"
               height="40"
             />

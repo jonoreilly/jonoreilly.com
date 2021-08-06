@@ -10,7 +10,7 @@
     </div>
     <div class="scroll-call-to-action">
       <p>Check my portfolio</p>
-      <img src="@/assets/Home/fa/long-arrow-alt-down.svg" width="8" />
+      <img src="@/assets/home/fa/long-arrow-alt-down.svg" width="8" />
     </div>
     <div class="contact-menu">
       <div class="contact-list">
@@ -21,7 +21,7 @@
           <a class="contact-link" :title="tooltip" :href="link" target="_blank">
             <div class="contact-body">
               <img
-                :src="require('@/assets/Home/fa/' + icon + '.svg')"
+                :src="require('@/assets/home/fa/' + icon + '.svg')"
                 width="35"
                 height="35"
               />
