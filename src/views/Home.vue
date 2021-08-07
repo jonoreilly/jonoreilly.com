@@ -25,14 +25,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-html,
-body {
-  margin: 0;
-  overflow: hidden;
-  background-color: $white;
-  color: $font-color;
-}
-
 .application {
   overflow-y: scroll;
   max-height: $app-height;

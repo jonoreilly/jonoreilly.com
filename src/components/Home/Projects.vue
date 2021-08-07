@@ -17,14 +17,13 @@
             <div class="content-body">{{ project.body }}</div>
             <div class="content-bottom">
               <template v-if="project.demo">
-                <a
-                  :href="project.demo"
-                  target="_blank"
+                <router-link
+                  :to="project.demo"
                   tooltip="Go to Demo"
                   class="demo-link"
                 >
                   Demo
-                </a>
+                </router-link>
               </template>
               <div class="tech-stack">
                 <span

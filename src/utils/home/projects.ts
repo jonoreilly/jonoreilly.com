@@ -21,7 +21,7 @@ export const projects: Project[] = [
     },
     title: "Orion",
     body: "Simulate the gravitational interaction between different sized bodies",
-    demo: "https://editor.p5js.org/jonoreilly/full/d2OGrtoVm",
+    demo: "/projects/orion",
     techStack: [
       {
         name: "p5.js",
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     },
     title: "Sudokutron",
     body: "Get hints to solve a sudoku, includes autocomplete functionality",
-    demo: "https://editor.p5js.org/jonoreilly/full/iLJUPN0dF",
+    demo: "/projects/sudokutron",
     techStack: [
       {
         name: "p5.js",

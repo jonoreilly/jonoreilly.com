@@ -1,22 +1,24 @@
 <template>
   <main>
     <Header @upload="alert('a')" />
-    <Canvas />
-    <Footer />
+    <div class="flex">
+      <Canvas />
+      <Controls />
+    </div>
   </main>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Header from "@/components/webGL/Header.vue";
-import Canvas from "@/components/webGL/Canvas.vue";
-import Footer from "@/components/webGL/Footer.vue";
+import Header from "@/components/projects/webgl/Header.vue";
+import Canvas from "@/components/projects/webgl/Canvas.vue";
+import Controls from "@/components/projects/webgl/Controls.vue";
 
 export default defineComponent({
   components: {
     Header,
     Canvas,
-    Footer,
+    Controls,
   },
 });
 </script>
@@ -35,5 +37,9 @@ main {
   flex-direction: column;
   justify-content: space-around;
   padding: 0 2rem;
+}
+
+.flex {
+  display: flex;
 }
 </style>
