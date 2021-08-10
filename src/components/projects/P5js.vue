@@ -17,7 +17,7 @@ export default defineComponent({
   $margin: 10px;
   width: calc(100% - (10px * 2));
   margin: $margin;
-  height: 90vh;
+  height: 85vh;
   border: none;
 }
 </style>
