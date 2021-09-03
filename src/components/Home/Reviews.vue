@@ -1,21 +1,21 @@
 <template>
-  <div class="section card-section reviews">
+  <div class="section content-section reviews">
     <div class="section-title">Reviews</div>
-    <div class="content-overflow">
-      <div class="content-container">
+    <div class="cards-container-overflow">
+      <div class="cards-container">
         <template
           v-for="{ stars, title, body, signature } in reviews"
           :key="'review' + title + signature"
         >
-          <div class="content-card">
-            <div class="content-top">
+          <div class="card">
+            <div class="card-top">
               <div class="review-title">
                 {{ title }}
               </div>
               <Stars :rating="stars" />
             </div>
-            <div class="content-body">{{ body }}</div>
-            <div class="content-bottom">
+            <div class="card-body">{{ body }}</div>
+            <div class="card-bottom">
               <a :href="signature.contact" class="signature">
                 {{ signature.name }}
               </a>
@@ -45,51 +45,54 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_card-section.scss";
+@import "@/assets/scss/_content-section.scss";
+@import "@/assets/scss/_card.scss";
 
 .reviews {
   background-color: $white;
-}
 
-.card-section {
-  .content-card {
-    border: 2px solid $white-2;
-    flex: 0 0 600px;
+  .cards-container-overflow {
+    .cards-container {
+      .card {
+        border: 2px solid $white-2;
+        flex: 0 0 600px;
 
-    .content-top {
-      display: grid;
-      grid-template-columns: 1fr auto;
+        .card-top {
+          display: grid;
+          grid-template-columns: 1fr auto;
 
-      @media (max-width: 800px) {
-        grid-template-columns: unset;
-        grid-template-rows: 1fr auto;
-      }
+          @media (max-width: 800px) {
+            grid-template-columns: unset;
+            grid-template-rows: 1fr auto;
+          }
 
-      .review-title {
-        padding-bottom: 10px;
-      }
-    }
-
-    .content-bottom {
-      align-self: end;
-      text-align: right;
-
-      .signature {
-        color: $font-weak-color;
-        text-decoration: none;
-
-        @media (max-width: 800px) {
-          color: black;
-          text-decoration: underline;
+          .review-title {
+            padding-bottom: 10px;
+          }
         }
-      }
-    }
 
-    &:hover {
-      .content-bottom {
-        .signature {
-          color: black;
-          text-decoration: underline;
+        .card-bottom {
+          align-self: end;
+          text-align: right;
+
+          .signature {
+            color: $font-weak-color;
+            text-decoration: none;
+
+            @media (max-width: 800px) {
+              color: black;
+              text-decoration: underline;
+            }
+          }
+        }
+
+        &:hover {
+          .card-bottom {
+            .signature {
+              color: black;
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

@@ -15,7 +15,7 @@ export default defineComponent({
   },
   data() {
     return {
-      title: "Sudokutron",
+      title: "Sudoku Solver",
       src: "https://preview.p5js.org/jonoreilly/embed/iLJUPN0dF",
     };
   },

@@ -15,7 +15,7 @@ export default defineComponent({
   },
   data() {
     return {
-      title: "Orion",
+      title: "Gravity Simulator",
       src: "https://preview.p5js.org/jonoreilly/embed/d2OGrtoVm",
     };
   },

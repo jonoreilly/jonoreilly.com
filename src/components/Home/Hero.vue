@@ -5,7 +5,7 @@
         <p>Hi, I'm</p>
         <p class="text-big">Jon O'Reilly</p>
         <p>& I'm a</p>
-        <p class="text-big">Full-stack <br class="break" />Engineer</p>
+        <p class="text-big">Front-End <br class="break" />Engineer</p>
       </div>
     </div>
     <div class="scroll-call-to-action">

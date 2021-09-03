@@ -14,12 +14,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("../views/projects/WebGL.vue"),
       },
       {
-        path: "orion",
-        component: () => import("../views/projects/Orion.vue"),
+        path: "gravity-simulator",
+        component: () => import("../views/projects/GravitySimulator.vue"),
       },
       {
-        path: "sudokutron",
-        component: () => import("../views/projects/Sudokutron.vue"),
+        path: "sudoku-solver",
+        component: () => import("../views/projects/SudokuSolver.vue"),
       },
     ],
   },

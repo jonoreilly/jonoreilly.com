@@ -1,0 +1,53 @@
+$bar-border-radius: 50px;
+
+.bars-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 30px;
+  width: 80%;
+  max-width: 800px;
+
+  .bar-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+
+      .bar-label-name {
+        font-size: $font-size-sub-title;
+        font-weight: bold;
+      }
+
+      .bar-label-experience {
+        visibility: hidden;
+        color: $font-weak-color;
+        font-size: $font-size-small;
+      }
+    }
+
+    .bar {
+      height: 30px;
+      border-radius: $bar-border-radius;
+      border: 1px solid $white-3;
+
+      .bar-filling {
+        border-radius: $bar-border-radius;
+        background-color: $blue-1;
+        width: 80%;
+        height: 100%;
+      }
+    }
+
+    &:hover {
+      .bar-label {
+        .bar-label-experience {
+          visibility: visible;
+        }
+      }
+    }
+  }
+}

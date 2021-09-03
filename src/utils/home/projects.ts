@@ -17,11 +17,11 @@ export type Project = {
 export const projects: Project[] = [
   {
     picture: {
-      filename: "orion.png",
+      filename: "gravity-simulator.png",
     },
-    title: "Orion",
+    title: "Gravity Simulator",
     body: "Simulate the gravitational interaction between different sized bodies",
-    demo: "/projects/orion",
+    demo: "/projects/gravity-simulator",
     techStack: [
       {
         name: "p5.js",
@@ -30,11 +30,11 @@ export const projects: Project[] = [
   },
   {
     picture: {
-      filename: "sudokutron.png",
+      filename: "sudoku-solver.png",
     },
-    title: "Sudokutron",
+    title: "Sudoku Solver",
     body: "Get hints to solve a sudoku, includes autocomplete functionality",
-    demo: "/projects/sudokutron",
+    demo: "/projects/sudoku-solver",
     techStack: [
       {
         name: "p5.js",
@@ -55,34 +55,6 @@ export const projects: Project[] = [
       },
       {
         name: "Telegram bot API",
-      },
-    ],
-  },
-  {
-    picture: {
-      filename: "homer.gif",
-    },
-    title: "Bluegate",
-    body: "Easy message feed for the non tech-savy members of the family",
-    techStack: [
-      {
-        name: "Python",
-        comma: ", ",
-      },
-      {
-        name: "PHP",
-      },
-    ],
-  },
-  {
-    picture: {
-      filename: "homer.gif",
-    },
-    title: "Crackdown",
-    body: "Find the quickest solution to any rubiks cube automatically (or try it yourself)",
-    techStack: [
-      {
-        name: "C#",
       },
     ],
   },

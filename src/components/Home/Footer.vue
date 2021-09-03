@@ -1,7 +1,7 @@
 <template>
   <div class="section banner-section" id="contact">
     <div class="section-title">Contact me!</div>
-    <div class="content-container">
+    <div class="link-container">
       <template
         v-for="{ tooltip, link, icon } in contacts"
         :key="'footer' + tooltip"
@@ -50,7 +50,7 @@ export default defineComponent({
   text-align: center;
 }
 
-.banner-section .content-container {
+.banner-section .link-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
