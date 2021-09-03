@@ -26,6 +26,10 @@ $bar-border-radius: 50px;
         visibility: hidden;
         color: $font-weak-color;
         font-size: $font-size-small;
+
+        @media (max-width: $breakpoint-sm) {
+          visibility: visible;
+        }
       }
     }
 

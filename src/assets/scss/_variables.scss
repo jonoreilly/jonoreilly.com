@@ -33,6 +33,9 @@ $font-size-normal: 16px;
 $font-size-normal-zoomed: 17px;
 $font-size-small: 12px;
 
-@media (max-width: 800px) {
+$breakpoint-md: 1300px;
+$breakpoint-sm: 800px;
+
+@media (max-width: $breakpoint-sm) {
   $section-height: 95vh;
 }

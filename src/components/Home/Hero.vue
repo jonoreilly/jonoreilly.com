@@ -178,14 +178,14 @@ export default defineComponent({
   border-color: $white-2;
 }
 
-@media (max-width: 1300px) and (min-width: 800px) {
+@media (max-width: $breakpoint-md) and (min-width: $breakpoint-sm) {
   #presentation .text-area {
     width: 700px;
     max-width: calc(100% - 80px);
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: $breakpoint-sm) {
   #presentation .text-area {
     width: 100%;
     white-space: normal;

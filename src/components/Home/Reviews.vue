@@ -61,7 +61,7 @@ export default defineComponent({
           display: grid;
           grid-template-columns: 1fr auto;
 
-          @media (max-width: 800px) {
+          @media (max-width: $breakpoint-sm) {
             grid-template-columns: unset;
             grid-template-rows: 1fr auto;
           }
@@ -79,7 +79,7 @@ export default defineComponent({
             color: $font-weak-color;
             text-decoration: none;
 
-            @media (max-width: 800px) {
+            @media (max-width: $breakpoint-sm) {
               color: black;
               text-decoration: underline;
             }

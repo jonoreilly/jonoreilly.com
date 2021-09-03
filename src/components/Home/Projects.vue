@@ -91,7 +91,7 @@ export default defineComponent({
               background-color: $white-3;
             }
 
-            @media (max-width: 800px) {
+            @media (max-width: $breakpoint-sm) {
               background-color: $white-2;
               color: black;
             }

@@ -74,7 +74,7 @@ export default defineComponent({
   background-color: $white-2;
 }
 
-@media (max-width: 800px) {
+@media (max-width: $breakpoint-sm) {
   #contact .contact-body {
     background-color: $white-2;
   }
