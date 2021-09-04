@@ -1,5 +1,5 @@
 <template>
-  <div class="section content-section skills">
+  <section class="section content-section skills" aria-label="Skills">
     <div class="section-title">Skills</div>
     <div class="bars-container">
       <template v-for="skill in skills" :key="'skills' + skill.name">
@@ -18,7 +18,7 @@
         </div>
       </template>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">

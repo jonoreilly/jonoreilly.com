@@ -1,23 +1,30 @@
 <template>
-  <div class="section banner-section" id="contact">
+  <footer class="section banner-section" id="contact">
     <div class="section-title">Contact me!</div>
     <div class="link-container">
       <template
         v-for="{ tooltip, link, icon } in contacts"
         :key="'footer' + tooltip"
       >
-        <a class="contact-link" :title="tooltip" :href="link" target="_blank">
+        <a
+          class="contact-link"
+          :title="tooltip"
+          :href="link"
+          target="_blank"
+          rel="noopener"
+        >
           <div class="contact-body">
             <img
               :src="require('@/assets/home/fa/' + icon + '.svg')"
               width="40"
               height="40"
+              :alt="tooltip"
             />
           </div>
         </a>
       </template>
     </div>
-  </div>
+  </footer>
 </template>
 
 <script lang="ts">

@@ -1,10 +1,11 @@
 <template>
   <header class="header">
-    <router-link to="/" class="back-link">
+    <router-link to="/" class="back-link" aria-label="Return home">
       <img
         :src="require('@/assets/projects/fa/arrow-left-solid.svg')"
         width="30"
         height="30"
+        alt="arrow-left"
       />
     </router-link>
     <h2>{{ title }}</h2>

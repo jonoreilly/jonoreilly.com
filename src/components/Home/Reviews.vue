@@ -1,5 +1,5 @@
 <template>
-  <div class="section content-section reviews">
+  <section class="section content-section reviews" aria-label="Reviews">
     <div class="section-title">Reviews</div>
     <div class="cards-container-overflow">
       <div class="cards-container">
@@ -24,7 +24,7 @@
         </template>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">

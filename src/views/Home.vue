@@ -1,9 +1,11 @@
 <template>
   <div class="application">
-    <Hero />
-    <Skills />
-    <Projects />
-    <Reviews />
+    <main>
+      <Hero />
+      <Skills />
+      <Projects />
+      <Reviews />
+    </main>
     <Footer />
   </div>
 </template>

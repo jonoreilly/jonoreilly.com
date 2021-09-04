@@ -1,5 +1,8 @@
 <template>
-  <div class="section content-section projects">
+  <section
+    class="section content-section projects"
+    aria-label="Personal projects"
+  >
     <div class="section-title">Personal Projects</div>
     <div class="cards-container-overflow">
       <div class="cards-container">
@@ -12,6 +15,7 @@
                 require('@/assets/home/projects/' + project.picture.filename)
               "
               :style="'object-fit: ' + project.picture.objectFit"
+              alt=""
             />
             <div class="card-top">{{ project.title }}</div>
             <div class="card-body">{{ project.body }}</div>
@@ -41,7 +45,7 @@
         </template>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">

@@ -1,7 +1,7 @@
 <template>
-  <div class="review-stars">
-    <img v-for="i in stars" :key="i" src="@/assets/home/fa/star.svg" />
-    <img v-if="hasHalfStar" src="@/assets/home/fa/star-half.svg" />
+  <div class="review-stars" :aria-label="'Rating: ' + rating + ' stars'">
+    <img v-for="i in stars" :key="i" src="@/assets/home/fa/star.svg" alt="" />
+    <img v-if="hasHalfStar" src="@/assets/home/fa/star-half.svg" alt="" />
   </div>
 </template>
 

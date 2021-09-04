@@ -1,5 +1,5 @@
 <template>
-  <div class="section" id="presentation">
+  <section class="section" id="presentation" aria-label="Introduction">
     <div class="text-area">
       <div class="text-container">
         <p>Hi, I'm</p>
@@ -10,7 +10,11 @@
     </div>
     <div class="scroll-call-to-action">
       <p>Check my portfolio</p>
-      <img src="@/assets/home/fa/long-arrow-alt-down.svg" width="8" />
+      <img
+        src="@/assets/home/fa/long-arrow-alt-down.svg"
+        width="8"
+        alt="arrow-down"
+      />
     </div>
     <div class="contact-menu">
       <div class="contact-list">
@@ -18,19 +22,26 @@
           v-for="{ tooltip, link, icon } in contacts"
           :key="'hero' + tooltip"
         >
-          <a class="contact-link" :title="tooltip" :href="link" target="_blank">
+          <a
+            class="contact-link"
+            :title="tooltip"
+            :href="link"
+            target="_blank"
+            rel="noopener"
+          >
             <div class="contact-body">
               <img
                 :src="require('@/assets/home/fa/' + icon + '.svg')"
                 width="35"
                 height="35"
+                :alt="tooltip"
               />
             </div>
           </a>
         </template>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
