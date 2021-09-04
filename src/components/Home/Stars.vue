@@ -1,8 +1,19 @@
 <template>
-  <div class="review-stars" :aria-label="'Rating: ' + rating + ' stars'">
-    <img v-for="i in stars" :key="i" src="@/assets/home/fa/star.svg" alt="" />
-    <img v-if="hasHalfStar" src="@/assets/home/fa/star-half.svg" alt="" />
-  </div>
+  <figure class="review-stars" :aria-label="'Rating: ' + rating + ' stars'">
+    <img
+      v-for="i in stars"
+      :key="i"
+      src="@/assets/home/fa/star.svg"
+      alt=""
+      aria-hidden="true"
+    />
+    <img
+      v-if="hasHalfStar"
+      src="@/assets/home/fa/star-half.svg"
+      alt=""
+      aria-hidden="true"
+    />
+  </figure>
 </template>
 
 <script lang="ts">
@@ -25,6 +36,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 $star-width: 22px;
+
 .review-stars {
   filter: invert(1) sepia(1) saturate(255) hue-rotate(-31deg);
   width: $star-width * 5;

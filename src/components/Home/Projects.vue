@@ -3,7 +3,7 @@
     class="section content-section projects"
     aria-label="Personal projects"
   >
-    <div class="section-title">Personal Projects</div>
+    <h2 class="section-title">Personal Projects</h2>
     <div class="cards-container-overflow">
       <div class="cards-container">
         <template v-for="project in projects" :key="'projects' + project.title">
@@ -17,8 +17,8 @@
               :style="'object-fit: ' + project.picture.objectFit"
               alt=""
             />
-            <div class="card-top">{{ project.title }}</div>
-            <div class="card-body">{{ project.body }}</div>
+            <h3 class="card-top">{{ project.title }}</h3>
+            <p class="card-body">{{ project.body }}</p>
             <div class="card-bottom">
               <template v-if="project.demo">
                 <router-link
@@ -29,7 +29,8 @@
                   Demo
                 </router-link>
               </template>
-              <div class="tech-stack">
+              <p class="tech-stack">
+                <span class="aria-only">Technologies used:</span>
                 <span
                   v-for="tech in project.techStack"
                   :key="'tech' + project.title + tech.name"
@@ -39,7 +40,7 @@
                   </span>
                   {{ tech.comma }}
                 </span>
-              </div>
+              </p>
             </div>
           </div>
         </template>
@@ -62,7 +63,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_content-section.scss";
 @import "@/assets/scss/_card.scss";
 
 .projects {

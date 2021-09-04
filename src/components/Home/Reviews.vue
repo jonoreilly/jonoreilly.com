@@ -1,6 +1,6 @@
 <template>
   <section class="section content-section reviews" aria-label="Reviews">
-    <div class="section-title">Reviews</div>
+    <h2 class="section-title">Reviews</h2>
     <div class="cards-container-overflow">
       <div class="cards-container">
         <template
@@ -9,15 +9,18 @@
         >
           <div class="card">
             <div class="card-top">
-              <div class="review-title">
+              <h3 class="review-title">
+                <span class="aria-only">Title: </span>
                 {{ title }}
-              </div>
+              </h3>
               <Stars :rating="stars" />
             </div>
-            <div class="card-body">{{ body }}</div>
+            <p class="card-body">{{ body }}</p>
             <div class="card-bottom">
-              <a :href="signature.contact" class="signature">
+              <a :href="signature.contact" class="signature" rel="noopener">
+                <span class="aria-only">Written by</span>
                 {{ signature.name }}
+                <span class="aria-only">. Link to his Linkedin profile</span>
               </a>
             </div>
           </div>
@@ -45,7 +48,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_content-section.scss";
 @import "@/assets/scss/_card.scss";
 
 .reviews {

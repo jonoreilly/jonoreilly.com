@@ -1,19 +1,19 @@
 <template>
-  <footer class="section banner-section" id="contact">
-    <div class="section-title">Contact me!</div>
-    <div class="link-container">
+  <footer class="section content-section banner-section footer">
+    <h2 class="section-title">Contact me!</h2>
+    <nav class="banner-container">
       <template
         v-for="{ tooltip, link, icon } in contacts"
         :key="'footer' + tooltip"
       >
         <a
-          class="contact-link"
+          class="banner"
           :title="tooltip"
           :href="link"
           target="_blank"
           rel="noopener"
         >
-          <div class="contact-body">
+          <div class="banner-body">
             <img
               :src="require('@/assets/home/fa/' + icon + '.svg')"
               width="40"
@@ -23,7 +23,7 @@
           </div>
         </a>
       </template>
-    </div>
+    </nav>
   </footer>
 </template>
 
@@ -41,49 +41,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.banner-section {
-  min-height: $banner-height;
+@import "@/assets/scss/_banner.scss";
+
+.footer {
   background-color: $white-3;
-  padding-bottom: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-.banner-section .section-title {
-  padding: 50px;
-  font-size: $font-size-title;
-  text-align: center;
-}
-
-.banner-section .link-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 2000px;
-}
-
-#contact .contact-link {
-  margin: 10px;
-}
-
-#contact .contact-body {
-  width: 65px;
-  height: 65px;
-  border-radius: 10px;
-  display: grid;
-  justify-items: center;
-  align-items: center;
-}
-
-#contact .contact-body:hover {
-  background-color: $white-2;
-}
-
-@media (max-width: $breakpoint-sm) {
-  #contact .contact-body {
-    background-color: $white-2;
-  }
 }
 </style>

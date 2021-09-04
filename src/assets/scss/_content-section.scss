@@ -1,3 +1,5 @@
+@import "./_section.scss";
+
 .content-section {
   padding: 20px 0px;
   display: flex;
@@ -10,6 +12,7 @@
   .section-title {
     padding: 50px;
     font-size: $font-size-title;
+    font-weight: unset;
     text-align: center;
   }
 }

@@ -1,20 +1,24 @@
 <template>
   <section class="section content-section skills" aria-label="Skills">
-    <div class="section-title">Skills</div>
+    <h2 class="section-title">Skills</h2>
     <div class="bars-container">
-      <template v-for="skill in skills" :key="'skills' + skill.name">
+      <template
+        v-for="{ name, experience, level } in skills"
+        :key="'skills' + name"
+      >
         <div class="bar-container">
           <div class="bar-label">
-            <div class="bar-label-name">
-              {{ skill.name }}
-            </div>
-            <div class="bar-label-experience">
-              {{ skill.experience }}
+            <h3 class="bar-label-name">
+              {{ name }}
+            </h3>
+            <div role="note" class="bar-label-experience">
+              <span class="aria-only">Experience:</span>
+              {{ experience }}
             </div>
           </div>
-          <div class="bar">
-            <div class="bar-filling" :style="`width: ${skill.level}%;`"></div>
-          </div>
+          <figure class="bar" :aria-label="'Skill level: ' + level + '/100'">
+            <div class="bar-filling" :style="`width: ${level}%;`"></div>
+          </figure>
         </div>
       </template>
     </div>
@@ -48,7 +52,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_content-section.scss";
 @import "@/assets/scss/_bar.scss";
 
 .skills {
