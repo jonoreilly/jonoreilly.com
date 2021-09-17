@@ -31,8 +31,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .application {
-  overflow-y: scroll;
-  max-height: $app-height;
   font-family: $font-family;
   scroll-behavior: smooth;
 }
