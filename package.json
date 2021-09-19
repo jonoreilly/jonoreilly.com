@@ -16,7 +16,7 @@
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
-    "vue-matomo": "^4.1.0",
+    "vue-gtag": "^2.0.1",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
