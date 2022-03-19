@@ -43,6 +43,19 @@ export const projects: Project[] = [
   },
   {
     picture: {
+      filename: "webgl.png",
+    },
+    title: "3D Renderer",
+    body: "Render any 3D object in a JS canvas",
+    demo: "/projects/webgl",
+    techStack: [
+      {
+        name: "js",
+      },
+    ],
+  },
+  {
+    picture: {
       filename: "notification-logger_mid-res.png",
       objectFit: "cover",
     },

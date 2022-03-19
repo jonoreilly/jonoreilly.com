@@ -1,37 +1,56 @@
 <template>
   <aside class="column">
-    <div class="grid">
-      <h2>Choose a file:</h2>
-      <input type="file" id="obj-file" @change="$emit('upload', $event)" />
-      <div class="file-options">
+    <div class="block">
+      <h2 class="pb">Choose a file: {{ file }}</h2>
+      <ul class="pb">
+        <li>
+          <label>
+            <input type="radio" name="file" value="cube.obj" v-model="file" />
+            Cube
+          </label>
+        </li>
+        <li>
+          <label>
+            <input
+              type="radio"
+              name="file"
+              value="lightedCube.obj"
+              v-model="file"
+            />
+            Lighted cube
+          </label>
+        </li>
+        <li>
+          <label>
+            <input
+              type="radio"
+              name="file"
+              value="pyramid.obj"
+              v-model="file"
+            />
+            Pyramid
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="radio" name="file" value="teapot.obj" v-model="file" />
+            Teapot
+          </label>
+        </li>
+      </ul>
+      <div>
         <label>
-          <input type="radio" name="file" />
-          Cube
+          Or upload your own: <br />
+          <input type="file" id="obj-file" @change="$emit('upload', $event)" />
         </label>
-        <button>-></button>
-        <label>
-          <input type="radio" name="file" />
-          Lighted cube
-        </label>
-        <button>-></button>
-        <label>
-          <input type="radio" name="file" />
-          Pyramid
-        </label>
-        <button>-></button>
-        <label>
-          <input type="radio" name="file" />
-          Teapot
-        </label>
-        <button>-></button>
       </div>
     </div>
-    <div>
-      <div class="grid">
-        <h2>Controls:</h2>
+    <div class="block">
+      <div>
+        <h2 class="pb">Controls:</h2>
         <ul>
-          <li>Arrow keys to move</li>
-          <li>
+          <li class="pb">Arrow keys to move</li>
+          <li class="pb">
             To rotate:
             <ul>
               <li>W/S for Y axis</li>
@@ -46,13 +65,27 @@
   </aside>
 </template>
 
-<style lang="scss" scoped>
-.grid {
-  text-align: left;
-  justify-items: center;
-  display: grid;
-}
+<script lang="ts">
+import { defineComponent } from "vue";
 
+export default defineComponent({
+  props: {
+    modelValue: { type: String, required: true },
+  },
+  computed: {
+    file: {
+      get(): string {
+        return this.modelValue;
+      },
+      set(value: string) {
+        this.$emit("update:modelValue", value);
+      },
+    },
+  },
+});
+</script>
+
+<style lang="scss" scoped>
 .column {
   display: flex;
   flex-direction: column;
@@ -60,9 +93,7 @@
   align-content: center;
 }
 
-.file-options {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 5px 15px;
+.pb {
+  padding-bottom: 10px;
 }
 </style>

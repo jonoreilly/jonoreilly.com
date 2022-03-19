@@ -26,5 +26,6 @@ module.exports = {
         ],
       })
     );
+    config.module.rules.push({ test: /\.obj$/i, use: "raw-loader" });
   },
 };

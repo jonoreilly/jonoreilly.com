@@ -20,7 +20,6 @@ export type Position3d = Position2d & {
 
 export type Projection = {
   position: Position2d;
-  color: RGB;
   distance: number;
 };
 
@@ -39,11 +38,14 @@ export type Matrices =
 
 export type Vertex = {
   position: Position3d;
-  normal: Position3d;
 };
 
 export type Light = {
   position: Position3d;
+  color: RGB;
+};
+
+export type LightProjection = Projection & {
   color: RGB;
 };
 
@@ -66,10 +68,19 @@ export type Camera = Position3d & {
 
 export type Face = [number, number, number];
 
-let material: Material = {};
-let vertices: Vertex[] = [];
-let indices: Face[] = [];
-let lights: Light[] = [];
+export type Character = {
+  material: Material;
+  vertices: Vertex[];
+  faces: Face[];
+  lights: Light[];
+};
+
+const character: Character = {
+  material: {},
+  vertices: [],
+  faces: [],
+  lights: [],
+};
 
 const matrices: Matrices = {};
 
@@ -98,50 +109,79 @@ const camera: Camera = {
 
 const backgroundColor = "#333";
 
+const defaultMaterial: Material = {
+  ambient: { red: 0.1, green: 0.1, blue: 0.1 },
+  diffuse: { red: 0.5, green: 0.5, blue: 0.5 },
+  specular: { red: 0.8, green: 0.8, blue: 0.8 },
+  shininess: 10,
+};
+
+const defaultLight: Light = {
+  position: {
+    x: 4,
+    y: 3,
+    z: 10,
+  },
+  color: { red: 1, green: 1, blue: 1 },
+};
+
 // -----------------------------------------------------------------------
 // Render ----------------------------------------------------------------
 // -----------------------------------------------------------------------
 
 function setupCanvas() {
   canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement;
+
   context = canvas.getContext("2d") as CanvasRenderingContext2D;
+
   setCanvasValues();
+
   render();
 }
 
 function setCanvasValues() {
   context.lineWidth = 0.5;
+
   context.fillStyle = backgroundColor;
 }
 
 function setupMatrices() {
   matrices.world = identity();
+
   matrices.view = view(camera.x, camera.y, camera.z);
+
   matrices.perspective = perspective(camera.fov, camera.near, camera.far);
 }
 
 function render() {
   renderer.shouldRender = true;
+
   renderCycle();
 }
 
 function renderCycle() {
   while (renderer.shouldRender && !renderer.isRendering) {
     renderer.shouldRender = false;
+
     renderer.isRendering = true;
-    const { positions, lights } = calculatePositions();
-    draw(positions, lights);
+
+    const { positions, lights, faceColors } = calculatePositions();
+
+    draw(positions, lights, faceColors);
+
     renderer.isRendering = false;
   }
 }
 
 function calculatePositions(): {
   positions: Projection[];
-  lights: Projection[];
+  faceColors: RGB[];
+  lights: LightProjection[];
 } {
-  const light3dPositions = lights.map<Light>(
+  const light3dPositions: Light[] = character.lights.map<Light>(
     ({ position: { x, y, z }, color }) => {
       const lightRespectToCamera = mat4Mult([[x, y, z, 1]], matrices.view);
+
       return {
         position: {
           x: lightRespectToCamera[0][0],
@@ -152,13 +192,16 @@ function calculatePositions(): {
       };
     }
   );
+
   const lightPositions = light3dPositions.map(
     ({ position: { x, y, z }, color }) => {
       const positionInProyectionPlane = mat4Mult(
         [[x, y, z, 1]],
         matrices.perspective
       );
+
       const positionInCanvas = mapTo2d(positionInProyectionPlane[0]);
+
       return {
         position: positionInCanvas,
         color: {
@@ -171,41 +214,88 @@ function calculatePositions(): {
     }
   );
 
-  const positions = vertices.map(({ position: { x, y, z }, normal }) => {
-    // calculate 3d vertex position
-    const vertexMat: [Row] = [[x, y, z, 1]];
-    const positionRespectToSelf = mat4Mult(vertexMat, matrices.world);
-    const positionRespectToCamera = mat4Mult(
-      positionRespectToSelf,
-      matrices.view
-    );
-    // calculate 2d vertex proyection
-    const positionInProyectionPlane = mat4Mult(
-      positionRespectToCamera,
-      matrices.perspective
-    );
-    const positionInCanvas = mapTo2d(positionInProyectionPlane[0]);
-    // apply rotations to normal
-    const [[nx, ny, nz]] = mat4Mult(
-      [[normal.x, normal.y, normal.z, 1]],
-      matrices.world
-    );
-    // calculate vertex color
-    const color = calculateColor(
-      positionRespectToCamera,
-      { x: nx, y: ny, z: nz },
-      light3dPositions
-    );
+  // Vertices
+
+  const verticesRespectToSelf = character.vertices.map(
+    ({ position: { x, y, z } }) => {
+      const vertexMat: [Row] = [[x, y, z, 1]];
+
+      return mat4Mult(vertexMat, matrices.world);
+    }
+  );
+
+  const verticesRespectToCamera = verticesRespectToSelf.map(
+    (vertexRespectToSelf) => {
+      return mat4Mult(vertexRespectToSelf, matrices.view);
+    }
+  );
+
+  // calculate 2d vertex proyection
+  const verticesInProyectionPlane = verticesRespectToCamera.map(
+    (vertexRespectToCamera) => {
+      return mat4Mult(vertexRespectToCamera, matrices.perspective);
+    }
+  );
+
+  const positions = verticesInProyectionPlane.map((vertexInProyectionPlane) => {
+    const positionInCanvas = mapTo2d(vertexInProyectionPlane[0]);
+
     return {
       position: positionInCanvas,
-      color,
-      distance: positionInProyectionPlane[0][2],
+      distance: vertexInProyectionPlane[0][2],
     };
+  });
+
+  // Faces
+
+  const faceVertices = character.faces.map((face) => {
+    return face.map<Position3d>((i) => {
+      const [[x, y, z]] = verticesRespectToSelf[i - 1];
+
+      return { x, y, z };
+    });
+  });
+
+  const faceNormals = faceVertices.map((vertices) => {
+    const sumPositions = vertices.reduce<Position3d>(
+      (acc, vertex) => {
+        return {
+          x: acc.x + vertex.x,
+          y: acc.y + vertex.y,
+          z: acc.z + vertex.z,
+        };
+      },
+      { x: 0, y: 0, z: 0 }
+    );
+
+    const center: Position3d = {
+      x: sumPositions.x / 3,
+      y: sumPositions.y / 3,
+      z: sumPositions.z / 3,
+    };
+
+    const [A, B, C] = vertices;
+
+    const x = (B.y - A.y) * (C.z - A.z) - (C.y - A.y) * (B.z - A.z);
+    const y = (B.z - A.z) * (C.x - A.x) - (C.z - A.z) * (B.x - A.x);
+    const z = (B.x - A.x) * (C.y - A.y) - (C.x - A.x) * (B.y - A.y);
+
+    const normal = normalize({ x, y, z });
+
+    return {
+      center,
+      normal,
+    };
+  });
+
+  const faceColors = faceNormals.map(({ center, normal }) => {
+    return calculateColor(center, normal, character.lights);
   });
 
   return {
     positions,
     lights: lightPositions,
+    faceColors,
   };
 }
 
@@ -218,67 +308,80 @@ function mapTo2d(position: Row): Position2d {
 }
 
 function calculateColor(
-  positionMat: RowMatrix,
+  center: Position3d,
   normal: Position3d,
   light3dPositions: Light[]
 ): RGB {
-  const position: Position3d = {
-    x: positionMat[0][0],
-    y: positionMat[0][1],
-    z: positionMat[0][2],
-  };
-  const toCamera = distance(position, camera);
+  const toCamera = normalize(distance(center, camera));
+
+  const dotNormalToCamera = dot(toCamera, normal);
+
+  const isNormalPointingToCamera = dotNormalToCamera < 0;
+
+  if (!isNormalPointingToCamera) {
+    normal = scalarMult(normal, -1);
+  }
+
   const ambientLight = calculateAmbientLight();
+
   const cumulativeColor = light3dPositions.reduce<RGB>(
-    (acc, cur) => {
-      const toLight = distance(position, cur.position);
-      const diffuseFactor = dot(normalize(toLight), normalize(normal));
-      const reflection = distance(
-        toLight,
-        scalarMult(normal, 2 * dot(normalize(normal), normalize(toLight)))
+    (acc, light) => {
+      const toLight = distance(center, light.position);
+
+      const diffuseFactor = dot(normalize(toLight), normal);
+
+      const reflection = normalize(
+        distance(
+          toLight,
+          scalarMult(normal, 2 * dot(normal, normalize(toLight)))
+        )
       );
+
       const specularFactor = Math.pow(
-        dot(normalize(reflection), normalize(toCamera)),
-        material.shininess
+        dot(reflection, toCamera),
+        character.material.shininess
       );
+
       const isFacingLight = diffuseFactor > 0;
+
       if (isFacingLight) {
         return {
           red:
             acc.red +
-            cur.color.red *
-              (material.diffuse.red * diffuseFactor +
-                material.specular.red * specularFactor),
+            light.color.red *
+              (character.material.diffuse.red * diffuseFactor +
+                character.material.specular.red * specularFactor),
           green:
             acc.green +
-            cur.color.green *
-              (material.diffuse.green * diffuseFactor +
-                material.specular.green * specularFactor),
+            light.color.green *
+              (character.material.diffuse.green * diffuseFactor +
+                character.material.specular.green * specularFactor),
           blue:
             acc.blue +
-            cur.color.blue *
-              (material.diffuse.blue * diffuseFactor +
-                material.specular.blue * specularFactor),
+            light.color.blue *
+              (character.material.diffuse.blue * diffuseFactor +
+                character.material.specular.blue * specularFactor),
         };
       } else {
         return acc;
       }
     },
     {
-      red: ambientLight.red * material.ambient.red,
-      green: ambientLight.green * material.ambient.green,
-      blue: ambientLight.blue * material.ambient.blue,
+      red: ambientLight.red * character.material.ambient.red,
+      green: ambientLight.green * character.material.ambient.green,
+      blue: ambientLight.blue * character.material.ambient.blue,
     }
   );
+
   return {
-    red: cumulativeColor.red * (1.0 / lights.length) * 255,
-    green: cumulativeColor.green * (1.0 / lights.length) * 255,
-    blue: cumulativeColor.blue * (1.0 / lights.length) * 255,
+    red: cumulativeColor.red * (1.0 / character.lights.length) * 255,
+    green: cumulativeColor.green * (1.0 / character.lights.length) * 255,
+    blue: cumulativeColor.blue * (1.0 / character.lights.length) * 255,
   };
 }
 
 function calculateAmbientLight(): RGB {
-  const sumLights = lights.reduce<RGB>(
+  const sumLights = character.lights.reduce<RGB>(
     (acc, cur) => {
       return {
         red: acc.red + cur.color.red,
@@ -288,10 +391,11 @@ function calculateAmbientLight(): RGB {
     },
     { red: 0, green: 0, blue: 0 }
   );
+
   return {
-    red: sumLights.red * (1.0 / lights.length),
-    green: sumLights.green * (1.0 / lights.length),
-    blue: sumLights.blue * (1.0 / lights.length),
+    red: sumLights.red * (1.0 / character.lights.length),
+    green: sumLights.green * (1.0 / character.lights.length),
+    blue: sumLights.blue * (1.0 / character.lights.length),
   };
 }
 
@@ -324,15 +428,24 @@ function scalarMult(v: Position3d, s: number): Position3d {
   };
 }
 
-function draw(positions: Projection[], lights: Projection[]) {
-  drawFlatShading(positions, lights);
+function draw(
+  positions: Projection[],
+  lights: LightProjection[],
+  faceColors: RGB[]
+) {
+  drawFlatShading(positions, lights, faceColors);
   // drawPhong(positions, lights);
 }
 
-function drawFlatShading(positions: Projection[], lights: Projection[]) {
-  console.log("draw Flat Shading");
+function drawFlatShading(
+  positions: Projection[],
+  lights: LightProjection[],
+  faceColors: RGB[]
+) {
+  // console.log("draw Flat Shading");
   context.fillStyle = backgroundColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
+
   for (const light of lights) {
     context.fillStyle = colorCode(light);
     context.beginPath();
@@ -345,29 +458,37 @@ function drawFlatShading(positions: Projection[], lights: Projection[]) {
     );
     context.fill();
   }
-  const measuredIndices = indices.map((i) => {
-    const i0 = positions[i[0] - 1];
-    const i1 = positions[i[1] - 1];
-    const i2 = positions[i[2] - 1];
-    const distance = i0.distance + i1.distance + i2.distance;
-    return [...i, distance];
-  });
-  const sortedIndices = measuredIndices.sort((a, b) => {
-    return b[3] - a[3];
-  });
-  for (const index of sortedIndices) {
-    const v0 = positions[index[0] - 1];
-    const v1 = positions[index[1] - 1];
-    const v2 = positions[index[2] - 1];
-    const averageColor = {
-      red: (v0.color.red + v1.color.red + v2.color.red) * 0.333,
-      green: (v0.color.green + v1.color.green + v2.color.green) * 0.333,
-      blue: (v0.color.blue + v1.color.blue + v2.color.blue) * 0.333,
+
+  const measuredFaces = character.faces.map((vertices, i) => {
+    const distance = vertices.reduce(
+      (acc, vertex) => acc + positions[vertex - 1].distance,
+      0
+    );
+
+    const color = faceColors[i];
+
+    return {
+      vertices,
+      distance,
+      color,
     };
-    const color = colorCode({ color: averageColor });
+  });
+
+  const sortedFaces = measuredFaces.sort((a, b) => {
+    return b.distance - a.distance;
+  });
+
+  for (const face of sortedFaces) {
+    const v0 = positions[face.vertices[0] - 1];
+    const v1 = positions[face.vertices[1] - 1];
+    const v2 = positions[face.vertices[2] - 1];
+
+    const color = colorCode({ color: face.color });
+
     // draw
     context.fillStyle = color;
     context.strokeStyle = color;
+    // context.strokeStyle = "rgba(0,0,0,0)";
     context.beginPath();
     context.moveTo(v0.position.x, v0.position.y);
     context.lineTo(v1.position.x, v1.position.y);
@@ -378,8 +499,8 @@ function drawFlatShading(positions: Projection[], lights: Projection[]) {
   }
 }
 
-function drawPhong(positions: Projection[], lights: Projection[]) {
-  console.log("draw Phong");
+function drawPhong(positions: Projection[], lights: LightProjection[]) {
+  // console.log("draw Phong");
   context.fillStyle = backgroundColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
   for (const light of lights) {
@@ -394,10 +515,10 @@ function drawPhong(positions: Projection[], lights: Projection[]) {
     );
     context.fill();
   }
-  for (const index of indices) {
-    const v0 = positions[index[0] - 1];
-    const v1 = positions[index[1] - 1];
-    const v2 = positions[index[2] - 1];
+  for (const face of character.faces) {
+    const v0 = positions[face[0] - 1];
+    const v1 = positions[face[1] - 1];
+    const v2 = positions[face[2] - 1];
     // draw lines
     drawLine(v0, v1);
     drawLine(v1, v2);
@@ -406,24 +527,25 @@ function drawPhong(positions: Projection[], lights: Projection[]) {
 }
 
 function drawLine(a: Projection, b: Projection) {
-  context.strokeStyle = createGradient(a, b);
+  // context.strokeStyle = createGradient(a, b);
+  context.strokeStyle = colorCode(defaultLight); // createGradient(a, b);
   context.beginPath();
   context.moveTo(a.position.x, a.position.y);
   context.lineTo(b.position.x, b.position.y);
   context.stroke();
 }
 
-function createGradient(a: Projection, b: Projection) {
-  const gradient = context.createLinearGradient(
-    a.position.x,
-    a.position.y,
-    b.position.x,
-    b.position.y
-  );
-  gradient.addColorStop(0, colorCode(a));
-  gradient.addColorStop(1, colorCode(b));
-  return gradient;
-}
+// function createGradient(a: Projection, b: Projection) {
+//   const gradient = context.createLinearGradient(
+//     a.position.x,
+//     a.position.y,
+//     b.position.x,
+//     b.position.y
+//   );
+//   gradient.addColorStop(0, colorCode(a));
+//   gradient.addColorStop(1, colorCode(b));
+//   return gradient;
+// }
 
 function colorCode({ color: { red, green, blue } }: { color: RGB }) {
   return `rgba(${red}, ${green}, ${blue}, 1)`;
@@ -647,7 +769,7 @@ function readFile(selectedFile: File): Promise<string> {
   });
 }
 
-function setupFileInput() {
+export function setupFileInput(): void {
   const fileInput = document.getElementById("obj-file") as HTMLInputElement;
   fileInput.onchange = async function () {
     const selectedFile = fileInput.files?.[0];
@@ -657,7 +779,8 @@ function setupFileInput() {
     }
     try {
       const fileContent = await readFile(selectedFile);
-      parseObjFile(fileContent);
+      const character = parseObjFile(fileContent);
+      setCharacter(character);
     } catch (error) {
       console.error(error);
       alert("Error reading file");
@@ -665,10 +788,10 @@ function setupFileInput() {
   };
 }
 
-function parseObjFile(file: string) {
-  let newMaterial: Material = {};
+function parseObjFile(file: string): Character {
+  let newMaterial: Material = defaultMaterial;
   const newVertices: Vertex[] = [];
-  const newIndices: Face[] = [];
+  const newFaces: Face[] = [];
   const newLights: Light[] = [];
   // parse file
   const rows = file.split("\n");
@@ -689,11 +812,10 @@ function parseObjFile(file: string) {
         case "V":
           newVertices.push({
             position: { x: values[0], y: values[1], z: values[2] },
-            normal: { x: values[3], y: values[4], z: values[5] },
           });
           break;
         case "F":
-          newIndices.push([values[0], values[1], values[2]]);
+          newFaces.push([values[0], values[1], values[2]]);
           break;
         case "L":
           newLights.push({
@@ -704,6 +826,11 @@ function parseObjFile(file: string) {
       }
     }
   }
+
+  if (!newLights.length) {
+    newLights.push(defaultLight);
+  }
+
   // center object
   const offsetTotal = newVertices.reduce<Position3d>(
     (acc, cur) => {
@@ -715,11 +842,13 @@ function parseObjFile(file: string) {
     },
     { x: 0, y: 0, z: 0 }
   );
+
   const offsetAverage: Position3d = {
     x: offsetTotal.x * (1.0 / newVertices.length),
     y: offsetTotal.y * (1.0 / newVertices.length),
     z: offsetTotal.z * (1.0 / newVertices.length),
   };
+
   const centeredVertices = newVertices.map<Vertex>((v) => {
     return {
       position: {
@@ -727,9 +856,9 @@ function parseObjFile(file: string) {
         y: v.position.y - offsetAverage.y,
         z: v.position.z - offsetAverage.z,
       },
-      normal: v.normal,
     };
   });
+
   const centeredLights = newLights.map<Light>((l) => {
     return {
       position: {
@@ -740,11 +869,21 @@ function parseObjFile(file: string) {
       color: l.color,
     };
   });
-  // store values
-  material = newMaterial;
-  vertices = centeredVertices;
-  indices = newIndices;
-  lights = centeredLights;
+
+  return {
+    material: newMaterial,
+    vertices: centeredVertices,
+    faces: newFaces,
+    lights: centeredLights,
+  };
+}
+
+export function setCharacter(value: Character): void {
+  character.faces = value.faces;
+  character.lights = value.lights;
+  character.material = value.material;
+  character.vertices = value.vertices;
+
   render();
 }
 
@@ -752,18 +891,17 @@ function parseObjFile(file: string) {
 // Initialization --------------------------------------------------------
 // -----------------------------------------------------------------------
 
-async function init() {
+export async function loadCharacter(filename: string): Promise<void> {
+  const fileModule = await require(`@/assets/projects/webGL/obj/${filename}`);
+  const character = parseObjFile(fileModule.default);
+  setCharacter(character);
+}
+
+export function init(): void {
   setupMatrices();
   setupFileInput();
   setKeyPressListeners();
   setupCanvas();
-  loadCube();
-}
-
-async function loadCube() {
-  const response = await fetch("./obj/lightedCube.obj");
-  const file = await response.text();
-  parseObjFile(file);
 }
 
 // })();
