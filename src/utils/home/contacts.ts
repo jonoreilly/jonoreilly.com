@@ -27,7 +27,7 @@ export const contacts: Contact[] = [
   },
   {
     tooltip: "My CV",
-    link: "./media/CV_JonOReilly_2021.pdf",
+    link: "./media/CV_JonOReilly_2022.pdf",
     icon: "file-pdf",
   },
 ];
