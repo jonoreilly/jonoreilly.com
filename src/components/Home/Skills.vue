@@ -35,9 +35,9 @@ type Skill = {
 };
 
 const skills: Skill[] = [
-  { name: "Vue.js", experience: "+2 years", level: 100 },
-  { name: "SCSS", experience: "1,5 years", level: 85 },
-  { name: "Typescript", experience: "1 year", level: 90 },
+  { name: "Vue.js", experience: "3 years", level: 100 },
+  { name: "SCSS", experience: "2.5 years", level: 85 },
+  { name: "Typescript", experience: "2 year", level: 90 },
   { name: "ARIA - Accessibility", experience: "2 years", level: 95 },
   { name: "Basketball (for scale)", experience: "+20 years", level: 20 },
 ];
