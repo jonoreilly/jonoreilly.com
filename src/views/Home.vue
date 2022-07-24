@@ -28,10 +28,19 @@ export default defineComponent({
     Footer,
   },
   mounted() {
-    let scriptTag = document.createElement("script");
-    scriptTag.setAttribute("type", "application/ld+json");
+    let scriptTag = document.querySelector(
+      'head script[type="application/ld+json"]'
+    );
+
+    if (!scriptTag) {
+      scriptTag = document.createElement("script");
+
+      scriptTag.setAttribute("type", "application/ld+json");
+
+      document.head.appendChild(scriptTag);
+    }
+
     scriptTag.innerHTML = JSON.stringify(jsonLd);
-    document.head.appendChild(scriptTag);
   },
 });
 </script>
