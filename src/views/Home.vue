@@ -42,6 +42,15 @@ export default defineComponent({
 
     scriptTag.innerHTML = JSON.stringify(jsonLd);
   },
+  unmounted() {
+    const scriptTag = document.querySelector(
+      'head script[type="application/ld+json"]'
+    );
+
+    if (scriptTag) {
+      document.head.removeChild(scriptTag);
+    }
+  },
 });
 </script>
 
