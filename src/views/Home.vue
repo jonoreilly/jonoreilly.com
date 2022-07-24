@@ -17,6 +17,7 @@ import Skills from "@/components/home/Skills.vue";
 import Projects from "@/components/home/Projects.vue";
 import Reviews from "@/components/home/Reviews.vue";
 import Footer from "@/components/home/Footer.vue";
+import jsonLd from "@/assets/home/jsonLd/jon-oreilly.json";
 
 export default defineComponent({
   components: {
@@ -25,6 +26,12 @@ export default defineComponent({
     Projects,
     Reviews,
     Footer,
+  },
+  mounted() {
+    let scriptTag = document.createElement("script");
+    scriptTag.setAttribute("type", "application/ld+json");
+    scriptTag.innerHTML = JSON.stringify(jsonLd);
+    document.head.appendChild(scriptTag);
   },
 });
 </script>

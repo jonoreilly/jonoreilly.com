@@ -1,0 +1,42 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Jon O'Reilly",
+  "description": "Frontend Engineer",
+  "url": "https://www.jonoreilly.com",
+  "jobTitle": "Frontend Engineer",
+  "image": "https://www.jonoreilly.com/media/authors/jon-oreilly.jpeg",
+  "email": "jon@jonoreilly.com",
+  "telephone": "+34644540989",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Easybell GmbH",
+    "description": "Telephony Company",
+    "url": "https://www.easybell.de",
+    "image": "https://www.easybell.de/favicon.ico",
+    "location": {
+      "@type": "PostalAddress",
+      "addressCountry": "DE",
+      "addressLocality": "Berlin",
+      "addressRegion": "Berlin",
+      "postalCode": "10179",
+      "streetAddress": "Brückenstraße 5a"
+    }
+  },
+  "owns": [
+    {
+      "@type": "OwnershipInfo",
+      "name": "jonoreilly.com",
+      "description": "Jon O'Reilly's portfolio",
+      "url": "https://www.jonoreilly.com",
+      "image": "https://www.jonoreilly.com/favicon.ico"
+    },
+    {
+      "@type": "OwnershipInfo",
+      "name": "mycodercorner.com",
+      "description": "Software Engineering Blog",
+      "url": "https://www.mycodercorner.com",
+      "image": "https://www.mycodercorner.com/favicon.ico"
+    }
+  ]
+}
