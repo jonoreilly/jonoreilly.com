@@ -60,6 +60,19 @@ export const routes: Array<RouteRecordRaw> = [
           ],
         },
       },
+      {
+        path: "rubiks-cube",
+        component: () => import("../views/projects/RubiksCube.vue"),
+        meta: {
+          title: "Jon O'Reilly - Projects - Rubik's Cube",
+          metaTags: [
+            {
+              name: "description",
+              content: "Enjoy this 3D Rubik's cube player",
+            },
+          ],
+        },
+      },
     ],
   },
 ];
