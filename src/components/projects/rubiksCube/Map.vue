@@ -8,14 +8,19 @@
     "
   >
     <div class="cube">
-      <div v-for="(_, f) in 6" :key="f" class="face">
-        <div v-for="(_, r) in 3" :key="r" class="row">
+      <div
+        v-for="faceName in faceNames"
+        :key="faceName"
+        class="face"
+        :face="faceName"
+        @click="rotate(faceName)"
+      >
+        <div v-for="(_, row) in 3" :key="row" class="row">
           <div
-            v-for="(_, c) in 3"
-            :key="c"
+            v-for="(_, column) in 3"
+            :key="column"
             class="cell"
-            :color="getColor(layout?.[f]?.[r]?.[c])"
-            @click="rotate(f)"
+            :face="layout[faceName][row][column].faceName"
           />
         </div>
       </div>
@@ -25,46 +30,24 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { getRotated, getCube } from "@/utils/projects/rubiksCube/cube";
-
-type Color = "white" | "red" | "green" | "yellow" | "blue" | "orange";
+import {
+  getRotated,
+  getCube,
+  faceNames,
+  FaceName,
+} from "@/utils/projects/rubiksCube/cube";
 
 export default defineComponent({
   data() {
     return {
       layout: getCube(),
+      faceNames,
     };
   },
 
   methods: {
-    rotate(face: number) {
+    rotate(face: FaceName) {
       this.layout = getRotated(this.layout, face);
-    },
-
-    getColor(cell: number): Color {
-      const cellsPerFace = 9;
-
-      if (cell < cellsPerFace) {
-        return "white";
-      }
-
-      if (cell < cellsPerFace * 2) {
-        return "red";
-      }
-
-      if (cell < cellsPerFace * 3) {
-        return "green";
-      }
-
-      if (cell < cellsPerFace * 4) {
-        return "yellow";
-      }
-
-      if (cell < cellsPerFace * 5) {
-        return "blue";
-      }
-
-      return "orange";
     },
   },
 });
@@ -86,47 +69,11 @@ export default defineComponent({
     outline: purple solid 10px;
     z-index: 10;
   }
-
-  $positions: (
-    1: (
-      row: 1,
-      column: 2,
-    ),
-    2: (
-      row: 2,
-      column: 1,
-    ),
-    3: (
-      row: 2,
-      column: 2,
-    ),
-    4: (
-      row: 2,
-      column: 3,
-    ),
-    5: (
-      row: 2,
-      column: 4,
-    ),
-    6: (
-      row: 3,
-      column: 2,
-    ),
-  );
-
-  @each $i, $position in $positions {
-    &:nth-child(#{$i}) {
-      grid-row: map-get($position, row);
-      grid-column: map-get($position, column);
-    }
-  }
 }
 
 .row {
   display: flex;
 }
-
-$colors: (white, red, green, yellow, blue, orange);
 
 $size: 60px;
 
@@ -134,11 +81,51 @@ $size: 60px;
   width: $size;
   height: $size;
   border: 1px solid black;
+}
 
-  @each $color in $colors {
-    &[color="#{$color}"] {
-      background-color: $color;
-    }
+$faces: (
+  up: (
+    color: white,
+    row: 1,
+    column: 2,
+  ),
+  left: (
+    color: red,
+    row: 2,
+    column: 1,
+  ),
+  front: (
+    color: green,
+    row: 2,
+    column: 2,
+  ),
+  right: (
+    color: yellow,
+    row: 2,
+    column: 3,
+  ),
+  back: (
+    color: blue,
+    row: 2,
+    column: 4,
+  ),
+  down: (
+    color: orange,
+    row: 3,
+    column: 2,
+  ),
+);
+
+@each $face, $settings in $faces {
+  .face[face="#{$face}"] {
+    grid-row: map-get($settings, row);
+    grid-column: map-get($settings, column);
+  }
+}
+
+@each $face, $settings in $faces {
+  .cell[face="#{$face}"] {
+    background-color: map-get($settings, color);
   }
 }
 </style>
