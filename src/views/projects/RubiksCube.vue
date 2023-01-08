@@ -1,18 +1,21 @@
 <template>
   <Title :title="title" />
 
-  <Canvas class="container" />
+  <!-- <Canvas class="container" /> -->
+  <Map />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Title from "@/components/projects/Title.vue";
-import Canvas from "@/components/projects/rubiksCube/Canvas.vue";
+// import Canvas from "@/components/projects/rubiksCube/Canvas.vue";
+import Map from "@/components/projects/rubiksCube/Map.vue";
 
 export default defineComponent({
   components: {
     Title,
-    Canvas,
+    // Canvas,
+    Map,
   },
   data() {
     return {
