@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { destroy, setup, state } from "@/utils/projects/rubiksCube/core";
+import { destroy, setup, state } from "@/utils/projects/rubiksCube/3d/core";
 
 const speed = 0.005;
 

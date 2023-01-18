@@ -1,4 +1,55 @@
 <template>
+  <div>
+    <button
+      style="
+        width: 200px;
+        height: 60px;
+        background: green;
+        border-radius: 10px;
+        cursor: pointer;
+      "
+      :disabled="isSolving"
+      @click="solve()"
+    >
+      {{ isSolving ? "SOLVING..." : "SOLVE" }}
+    </button>
+
+    <p>Processed positions: {{ stats.total }}</p>
+
+    <p>Discarded positions: {{ stats.discarded }}</p>
+
+    <p>
+      Discard percentage:
+      {{ ((stats.discarded * 100) / stats.total).toFixed() }}%
+    </p>
+
+    <p>
+      Positions processed per second: {{ stats.positionsPerSecond.toFixed(2) }}
+    </p>
+
+    <p>Movemet depth: {{ stats.depth }}</p>
+
+    <p>Steps to solve: {{ stepsToSolve }}</p>
+
+    <div class="cube cube-sm">
+      <div
+        v-for="faceName in faceNames"
+        :key="faceName"
+        class="face"
+        :face="faceName"
+      >
+        <div v-for="(_, row) in 3" :key="row" class="row">
+          <div
+            v-for="(_, column) in 3"
+            :key="column"
+            class="cell"
+            :face="stats.cube[faceName][row][column].faceName"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div
     style="
       display: flex;
@@ -20,7 +71,7 @@
             v-for="(_, column) in 3"
             :key="column"
             class="cell"
-            :face="layout[faceName][row][column].faceName"
+            :face="cube[faceName][row][column].faceName"
           />
         </div>
       </div>
@@ -36,18 +87,40 @@ import {
   faceNames,
   FaceName,
 } from "@/utils/projects/rubiksCube/cube";
+import { getStepsToSolve } from "@/utils/projects/rubiksCube/solvers/bruteForce";
 
 export default defineComponent({
   data() {
     return {
-      layout: getCube(),
+      cube: getCube(),
       faceNames,
+      stepsToSolve: [] as FaceName[],
+      isSolving: false,
+      stats: {
+        total: 0,
+        discarded: 0,
+        cube: getCube(),
+        depth: 0,
+        positionsPerSecond: 0,
+      },
     };
   },
 
   methods: {
-    rotate(face: FaceName) {
-      this.layout = getRotated(this.layout, face);
+    rotate(faceName: FaceName) {
+      this.cube = getRotated(this.cube, faceName);
+    },
+
+    async solve() {
+      this.isSolving = true;
+
+      this.stepsToSolve = [];
+
+      this.stepsToSolve = await getStepsToSolve(this.cube, (stats) => {
+        this.stats = { ...stats };
+      });
+
+      this.isSolving = false;
     },
   },
 });
@@ -81,6 +154,13 @@ $size: 60px;
   width: $size;
   height: $size;
   border: 1px solid black;
+}
+
+.cube-sm {
+  .cell {
+    width: $size/6;
+    height: $size/6;
+  }
 }
 
 $faces: (

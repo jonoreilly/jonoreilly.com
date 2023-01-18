@@ -82,10 +82,10 @@ function rotateFace(face: Face): Face {
   ];
 }
 
-export function getRotated(cube: Cube, face: FaceName): Cube {
+export function getRotated(cube: Cube, faceName: FaceName): Cube {
   const clone = cloneDeep(cube);
 
-  switch (face) {
+  switch (faceName) {
     case "up":
       return {
         up: rotateFace(clone.up),
@@ -210,4 +210,18 @@ export function getRotated(cube: Cube, face: FaceName): Cube {
         down: rotateFace(clone.down),
       };
   }
+}
+
+export function areSameCube(a: Cube, b: Cube) {
+  for (const faceName of faceNames) {
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
+        if (a[faceName][x][y].id !== b[faceName][x][y].id) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
 }
