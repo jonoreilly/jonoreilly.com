@@ -29,7 +29,15 @@
 
     <p>Movemet depth: {{ stats.depth }}</p>
 
+    <p>Distance to solved: {{ stats.distance }}</p>
+
+    <p>Elapsed time: {{ elapsedTimeParsed }}</p>
+
+    <p>Is using Dijkstra: {{ stats.isUsingDijkstra }}</p>
+
     <p>Steps to solve: {{ stepsToSolve }}</p>
+
+    <p>Current distance to solved: {{ currentDistanceToSolved }}</p>
 
     <div class="cube cube-sm">
       <div
@@ -87,7 +95,10 @@ import {
   faceNames,
   FaceName,
 } from "@/utils/projects/rubiksCube/cube";
-import { getStepsToSolve } from "@/utils/projects/rubiksCube/solvers/bruteForce";
+import {
+  getStepsToSolve,
+  getDistanceToSolved,
+} from "@/utils/projects/rubiksCube/solvers/bruteForceToDijkstra";
 
 export default defineComponent({
   data() {
@@ -102,8 +113,29 @@ export default defineComponent({
         cube: getCube(),
         depth: 0,
         positionsPerSecond: 0,
+        distance: 0,
+        elapsedTime: 0,
+        isUsingDijkstra: false,
       },
     };
+  },
+
+  computed: {
+    currentDistanceToSolved(): number {
+      return getDistanceToSolved(this.cube);
+    },
+
+    elapsedTimeParsed(): string {
+      const seconds = this.stats.elapsedTime / 1000;
+
+      const minutes = seconds / 60;
+
+      const hours = minutes / 60;
+
+      return `${hours.toFixed().padStart(2, "0")}h ${(minutes % 60)
+        .toFixed()
+        .padStart(2, "0")}m ${(seconds % 60).toFixed(2).padStart(5, "0")}s`;
+    },
   },
 
   methods: {

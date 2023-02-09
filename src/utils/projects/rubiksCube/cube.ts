@@ -14,6 +14,8 @@ export type FaceName = typeof faceNames[number];
 export type Cell = {
   id: number;
   faceName: FaceName;
+  row: number;
+  column: number;
 };
 
 export type Face = [[Cell, Cell, Cell], [Cell, Cell, Cell], [Cell, Cell, Cell]];
@@ -27,7 +29,7 @@ export type Cube = {
   down: Face;
 };
 
-function createCell(faceName: FaceName, row: number, column: number) {
+function createCell(faceName: FaceName, row: number, column: number): Cell {
   const faceId = {
     up: 0,
     left: 1,
@@ -40,6 +42,8 @@ function createCell(faceName: FaceName, row: number, column: number) {
   return {
     id: faceId * 9 + row * 3 + column,
     faceName,
+    row,
+    column,
   };
 }
 
