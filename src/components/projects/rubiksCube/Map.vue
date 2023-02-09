@@ -98,7 +98,7 @@ import {
 import {
   getStepsToSolve,
   getDistanceToSolved,
-} from "@/utils/projects/rubiksCube/solvers/bruteForceToDijkstra";
+} from "@/utils/projects/rubiksCube/solvers/index";
 
 export default defineComponent({
   data() {
@@ -115,7 +115,6 @@ export default defineComponent({
         positionsPerSecond: 0,
         distance: 0,
         elapsedTime: 0,
-        isUsingDijkstra: false,
       },
     };
   },
@@ -148,8 +147,13 @@ export default defineComponent({
 
       this.stepsToSolve = [];
 
-      this.stepsToSolve = await getStepsToSolve(this.cube, (stats) => {
-        this.stats = { ...stats };
+      this.stepsToSolve = await getStepsToSolve({
+        cube: this.cube,
+        progressCallback: (stats) => {
+          this.stats = { ...stats };
+        },
+        algorythm: "dijkstra",
+        storage: "object",
       });
 
       this.isSolving = false;

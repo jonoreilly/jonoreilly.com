@@ -81,9 +81,9 @@ export const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "demo",
-        component: () => import("../views/projects/notionWidgets/Demo.vue"),
+        component: () => import("../views/notionWidgets/Demo.vue"),
         meta: {
-          title: "Jon O'Reilly - Projects - Notion widgets - Demo",
+          title: "Jon O'Reilly - Notion widgets - Demo",
           metaTags: [
             {
               name: "description",
