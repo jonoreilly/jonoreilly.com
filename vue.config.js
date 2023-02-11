@@ -23,8 +23,13 @@ module.exports = {
           "/projects/webgl",
           "/projects/gravity-simulator",
           "/projects/sudoku-solver",
-          "/notion-widgets/demo",
         ],
+        renderOption: {
+          forceMock: {
+            "https://preview.p5js.org/jonoreilly/embed/iLJUPN0dF": "Sudoku",
+            "https://preview.p5js.org/jonoreilly/embed/d2OGrtoVm": "Gravity",
+          },
+        },
       })
     );
     config.module.rules.push({ test: /\.obj$/i, use: "raw-loader" });
