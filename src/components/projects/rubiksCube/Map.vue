@@ -1,18 +1,69 @@
 <template>
   <div>
-    <button
-      style="
-        width: 200px;
-        height: 60px;
-        background: green;
-        border-radius: 10px;
-        cursor: pointer;
-      "
-      :disabled="isSolving"
-      @click="solve()"
-    >
-      {{ isSolving ? "SOLVING..." : "SOLVE" }}
-    </button>
+    <p>
+      <label>
+        Algorythm:
+
+        <select v-model="params.algorythm">
+          <option
+            v-for="option in algorythmOptions"
+            :key="option"
+            :value="option"
+          >
+            {{ option }}
+          </option>
+        </select>
+      </label>
+    </p>
+
+    <p>
+      <label>
+        Storage structure:
+
+        <select v-model="params.storage">
+          <option
+            v-for="option in storageOptions"
+            :key="option"
+            :value="option"
+          >
+            {{ option }}
+          </option>
+        </select>
+      </label>
+    </p>
+
+    <p>
+      <template v-if="isSolving">
+        <button
+          style="
+            width: 200px;
+            height: 60px;
+            background: red;
+            border-radius: 10px;
+            cursor: pointer;
+          "
+          @click="stopSolving()"
+        >
+          STOP
+        </button>
+
+        SOLVING...
+      </template>
+
+      <button
+        v-else
+        style="
+          width: 200px;
+          height: 60px;
+          background: green;
+          border-radius: 10px;
+          cursor: pointer;
+        "
+        @click="solve()"
+      >
+        SOLVE
+      </button>
+    </p>
 
     <p>Processed positions: {{ stats.total }}</p>
 
@@ -27,15 +78,26 @@
       Positions processed per second: {{ stats.positionsPerSecond.toFixed(2) }}
     </p>
 
+    <p>
+      Total posible combinations:
+      {{ totalCombinations }}
+    </p>
+
+    <p>
+      Percentage processed:
+      {{ ((stats.total * 100) / totalCombinations).toFixed(70) }} %
+    </p>
+
+    <p>
+      Estimated time until solved:
+      {{ elapsedTimeUntilSolvedParsed }}
+    </p>
+
     <p>Movemet depth: {{ stats.depth }}</p>
 
     <p>Distance to solved: {{ stats.distance }}</p>
 
     <p>Elapsed time: {{ elapsedTimeParsed }}</p>
-
-    <p>Is using Dijkstra: {{ stats.isUsingDijkstra }}</p>
-
-    <p>Steps to solve: {{ stepsToSolve }}</p>
 
     <p>Current distance to solved: {{ currentDistanceToSolved }}</p>
 
@@ -56,6 +118,8 @@
         </div>
       </div>
     </div>
+
+    <p>Steps to solve: {{ stepsToSolve }}</p>
   </div>
 
   <div
@@ -79,7 +143,7 @@
             v-for="(_, column) in 3"
             :key="column"
             class="cell"
-            :face="cube[faceName][row][column].faceName"
+            :face="params.cube[faceName][row][column].faceName"
           />
         </div>
       </div>
@@ -98,15 +162,67 @@ import {
 import {
   getStepsToSolve,
   getDistanceToSolved,
+  Params,
 } from "@/utils/projects/rubiksCube/solvers/index";
+
+const algorythmOptions: Params["algorythm"][] = ["brute-force", "dijkstra"];
+const storageOptions: Params["storage"][] = ["object", "array"];
+
+function factorial(n: number): number {
+  if (n <= 1) {
+    return n;
+  }
+
+  return n * factorial(n - 1);
+}
+
+const totalCombinations = factorial(9 * 6);
+
+function parseTime(millis: number) {
+  const seconds = millis / 1000;
+  const minutes = seconds / 60;
+  const hours = minutes / 60;
+  const days = hours / 24;
+  const years = days / 365;
+
+  let result = "";
+
+  if (years >= 1) {
+    result += years.toFixed().padStart(4, "0") + "years ";
+  }
+
+  if (days >= 1) {
+    result += (days % 365).toFixed().padStart(2, "0") + "days ";
+  }
+
+  if (hours >= 1) {
+    result += (hours % 24).toFixed().padStart(2, "0") + "h ";
+  }
+
+  if (minutes >= 1) {
+    result += (minutes % 60).toFixed().padStart(2, "0") + "m ";
+  }
+
+  result += (seconds % 60).toFixed(2).padStart(5, "0") + "s";
+
+  return result;
+}
 
 export default defineComponent({
   data() {
     return {
-      cube: getCube(),
       faceNames,
+      algorythmOptions,
+      storageOptions,
+      totalCombinations,
+      params: {
+        algorythm: "dijkstra" as Params["algorythm"],
+        storage: "object" as Params["storage"],
+        cube: getCube(),
+      },
       stepsToSolve: [] as FaceName[],
       isSolving: false,
+      shouldStopSolver: false,
       stats: {
         total: 0,
         discarded: 0,
@@ -121,42 +237,59 @@ export default defineComponent({
 
   computed: {
     currentDistanceToSolved(): number {
-      return getDistanceToSolved(this.cube);
+      return getDistanceToSolved(this.params.cube);
     },
 
     elapsedTimeParsed(): string {
-      const seconds = this.stats.elapsedTime / 1000;
+      return parseTime(this.stats.elapsedTime);
+    },
 
-      const minutes = seconds / 60;
+    elapsedTimeUntilSolvedParsed(): string {
+      const seconds =
+        (totalCombinations - this.stats.total) / this.stats.positionsPerSecond;
 
-      const hours = minutes / 60;
+      const millis = seconds * 1000;
 
-      return `${hours.toFixed().padStart(2, "0")}h ${(minutes % 60)
-        .toFixed()
-        .padStart(2, "0")}m ${(seconds % 60).toFixed(2).padStart(5, "0")}s`;
+      return parseTime(millis);
     },
   },
 
   methods: {
     rotate(faceName: FaceName) {
-      this.cube = getRotated(this.cube, faceName);
+      this.params.cube = getRotated(this.params.cube, faceName);
     },
 
-    async solve() {
-      this.isSolving = true;
+    solve() {
+      if (this.isSolving) {
+        return;
+      }
 
-      this.stepsToSolve = [];
+      (async () => {
+        this.isSolving = true;
 
-      this.stepsToSolve = await getStepsToSolve({
-        cube: this.cube,
-        progressCallback: (stats) => {
-          this.stats = { ...stats };
-        },
-        algorythm: "dijkstra",
-        storage: "object",
-      });
+        this.shouldStopSolver = false;
 
-      this.isSolving = false;
+        this.stepsToSolve = [];
+
+        this.stepsToSolve = await getStepsToSolve({
+          cube: this.params.cube,
+          progressCallback: (stats) => {
+            this.stats = { ...stats };
+
+            return {
+              shouldStop: this.shouldStopSolver,
+            };
+          },
+          algorythm: this.params.algorythm,
+          storage: this.params.storage,
+        });
+
+        this.isSolving = false;
+      })();
+    },
+
+    stopSolving() {
+      this.shouldStopSolver = true;
     },
   },
 });

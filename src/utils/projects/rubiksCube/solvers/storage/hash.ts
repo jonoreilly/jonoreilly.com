@@ -28,7 +28,7 @@ export class Hash<T> implements Storage<T> {
 
     this.hashFn = hashFn;
 
-    items.forEach(this.add);
+    items.forEach((item) => this.add(item));
   }
 
   get length() {

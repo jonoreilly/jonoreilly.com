@@ -4,7 +4,7 @@ export class List<T> implements Storage<T> {
   private list: T[] = [];
 
   constructor(items: T[] = []) {
-    items.forEach(this.add);
+    items.forEach((item) => this.add(item));
   }
 
   get length() {

@@ -28,9 +28,9 @@ type Position = {
   distance: number;
 };
 
-type Params = {
+export type Params = {
   cube: Cube;
-  progressCallback: (stats: Stats) => void;
+  progressCallback: (stats: Stats) => { shouldStop: boolean };
   algorythm: "brute-force" | "dijkstra";
   storage: "array" | "object";
 };
@@ -160,12 +160,16 @@ export async function getStepsToSolve(params: Params) {
       if (stats.stats.total % callbackDelay === 0) {
         const currentStats = stats.stats;
 
-        params.progressCallback({
+        const { shouldStop } = params.progressCallback({
           ...currentStats,
           cube: newCube,
           depth: position.depth + 1,
           distance: position.distance,
         });
+
+        if (shouldStop) {
+          return [];
+        }
 
         await new Promise<void>((resolve) => setTimeout(() => resolve(), 0));
 

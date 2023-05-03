@@ -18,7 +18,7 @@ export class OrderedLinkedList<T> implements Storage<T> {
   constructor(weightFn: (item: T) => number, items: T[] = []) {
     this.weightFn = weightFn;
 
-    items.forEach(this.add);
+    items.forEach((item) => this.add(item));
   }
 
   get length() {
