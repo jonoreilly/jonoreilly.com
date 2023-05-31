@@ -71,4 +71,17 @@ export const projects: Project[] = [
       },
     ],
   },
+  {
+    picture: {
+      filename: "daytime-comparator.png",
+    },
+    title: "Daytime Comparator",
+    body: "Compare the daytime between different timezones",
+    demo: "/projects/daytime-comparator",
+    techStack: [
+      {
+        name: "js",
+      },
+    ],
+  },
 ];

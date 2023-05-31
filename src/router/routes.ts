@@ -73,6 +73,19 @@ export const routes: Array<RouteRecordRaw> = [
           ],
         },
       },
+      {
+        path: "daytime-comparator",
+        component: () => import("../views/projects/DaytimeComparator.vue"),
+        meta: {
+          title: "Jon O'Reilly - Projects - Daytime Comparator",
+          metaTags: [
+            {
+              name: "description",
+              content: "Useful daytime comparator",
+            },
+          ],
+        },
+      },
     ],
   },
 ];
