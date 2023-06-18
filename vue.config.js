@@ -23,6 +23,7 @@ module.exports = {
           "/projects/webgl",
           "/projects/gravity-simulator",
           "/projects/sudoku-solver",
+          "/projects/daytime-comparator",
         ],
         renderOption: {
           forceMock: {
