@@ -1,6 +1,6 @@
 export type Cell<T> = {
-  x: number;
-  y: number;
+  row: number;
+  column: number;
   value: T;
 };
 
@@ -8,18 +8,18 @@ export type Board<T> = Cell<T>[][];
 
 export function createBoard<T>(
   size: number,
-  valueGetter: (x: number, y: number) => T
+  valueGetter: (row: number, column: number) => T
 ) {
   const board: Board<T> = [];
 
-  for (let x = 0; x < size; x++) {
-    board[x] = [];
+  for (let row = 0; row < size; row++) {
+    board[row] = [];
 
-    for (let y = 0; y < size; y++) {
-      board[x][y] = {
-        x,
-        y,
-        value: valueGetter(x, y),
+    for (let column = 0; column < size; column++) {
+      board[row][column] = {
+        row,
+        column,
+        value: valueGetter(row, column),
       };
     }
   }
@@ -33,9 +33,9 @@ export function isAnyInBoard<T>(
 ) {
   const size = board.length;
 
-  for (let x = 0; x < size; x++) {
-    for (let y = 0; y < size; y++) {
-      if (assertion(board[x][y])) {
+  for (let row = 0; row < size; row++) {
+    for (let column = 0; column < size; column++) {
+      if (assertion(board[row][column])) {
         return true;
       }
     }
@@ -51,9 +51,9 @@ export function areSameBoards<T>(
 ) {
   const size = board1.length;
 
-  for (let x = 0; x < size; x++) {
-    for (let y = 0; y < size; y++) {
-      if (!areSameValue(board1[x][y].value, board2[x][y].value)) {
+  for (let row = 0; row < size; row++) {
+    for (let column = 0; column < size; column++) {
+      if (!areSameValue(board1[row][column].value, board2[row][column].value)) {
         return false;
       }
     }
@@ -68,9 +68,9 @@ export function forEachCell<T>(
 ) {
   const size = board.length;
 
-  for (let x = 0; x < size; x++) {
-    for (let y = 0; y < size; y++) {
-      callback(board[x][y]);
+  for (let row = 0; row < size; row++) {
+    for (let column = 0; column < size; column++) {
+      callback(board[row][column]);
     }
   }
 }
@@ -82,11 +82,14 @@ export function mergeBoards<T>(
 ) {
   const size = board1.length;
 
-  const board = createBoard(size, () => undefined) as Board<T>;
+  const board = createBoard(size, () => undefined as unknown as T);
 
-  for (let x = 0; x < size; x++) {
-    for (let y = 0; y < size; y++) {
-      board[x][y].value = merger(board1[x][y].value, board2[x][y].value);
+  for (let row = 0; row < size; row++) {
+    for (let column = 0; column < size; column++) {
+      board[row][column].value = merger(
+        board1[row][column].value,
+        board2[row][column].value
+      );
     }
   }
 
