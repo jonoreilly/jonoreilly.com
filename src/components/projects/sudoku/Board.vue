@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 20px">
+  <div class="buttons">
     <button @click="reset()">RESET</button>
   </div>
 
@@ -12,11 +12,11 @@
             class="cell"
             :data-row="row"
             :data-column="column"
-            @keydown="onBoardCellChanged(row, column, $event)"
+            @keydown="onKey(row, column, $event)"
           >
-            <b v-if="board[row][column].value !== undefined">
+            <span v-if="board[row][column].value !== undefined" class="final">
               {{ board[row][column].value + 1 }}
-            </b>
+            </span>
 
             <div v-else class="suggestions">
               <div v-for="(_, s) in SIZE" :key="s">
@@ -63,56 +63,84 @@ export default defineComponent({
       this.updateSuggestions();
     },
 
-    onBoardCellChanged(row: number, column: number, $event: KeyboardEvent) {
+    onKey(row: number, column: number, $event: KeyboardEvent) {
       // Check arrows for movement
       if (
         ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
           $event.code
         )
       ) {
-        let nextRow = row;
-        let nextColumn = column;
-
-        switch ($event.code) {
-          case "ArrowUp":
-            if (nextRow > 0) {
-              nextRow--;
-            }
-
-            break;
-
-          case "ArrowDown":
-            if (nextRow < SIZE - 1) {
-              nextRow++;
-            }
-
-            break;
-
-          case "ArrowLeft":
-            if (nextColumn > 0) {
-              nextColumn--;
-            }
-
-            break;
-
-          case "ArrowRight":
-            if (nextColumn < SIZE - 1) {
-              nextColumn++;
-            }
-
-            break;
-        }
-
-        this.$el.parentElement
-          .querySelector(`[data-row="${nextRow}"][data-column="${nextColumn}"]`)
-          ?.focus();
+        this.onArrowKey(row, column, $event);
 
         return;
       }
 
-      // Check values for input
+      // Check values for numbers
 
-      const valuesMap: Record<string, number> = {
+      if (
+        [
+          "Digit0",
+          "Digit1",
+          "Digit2",
+          "Digit3",
+          "Digit4",
+          "Digit5",
+          "Digit6",
+          "Digit7",
+          "Digit8",
+          "Digit9",
+        ].includes($event.code)
+      ) {
+        this.onNumberKey(row, column, $event);
+
+        return;
+      }
+
+      console.log("Invalid key", $event.code);
+    },
+
+    onArrowKey(row: number, column: number, $event: KeyboardEvent) {
+      let nextRow = row;
+      let nextColumn = column;
+
+      switch ($event.code) {
+        case "ArrowUp":
+          if (nextRow > 0) {
+            nextRow--;
+          }
+
+          break;
+
+        case "ArrowDown":
+          if (nextRow < SIZE - 1) {
+            nextRow++;
+          }
+
+          break;
+
+        case "ArrowLeft":
+          if (nextColumn > 0) {
+            nextColumn--;
+          }
+
+          break;
+
+        case "ArrowRight":
+          if (nextColumn < SIZE - 1) {
+            nextColumn++;
+          }
+
+          break;
+      }
+
+      this.$el.parentElement
+        .querySelector(`[data-row="${nextRow}"][data-column="${nextColumn}"]`)
+        ?.focus();
+    },
+
+    onNumberKey(row: number, column: number, $event: KeyboardEvent) {
+      const valuesMap: Record<string, number | undefined> = {
+        Digit0: undefined,
         Digit1: 0,
         Digit2: 1,
         Digit3: 2,
@@ -126,24 +154,6 @@ export default defineComponent({
 
       const value = valuesMap[$event.code];
 
-      if (value === undefined) {
-        console.log("Invalid key", $event);
-
-        return;
-      }
-
-      if (this.board[row][column].value !== undefined) {
-        console.log("Cell already set");
-
-        return;
-      }
-
-      if (!this.suggestionsBoard[row][column].value[value]) {
-        console.log("Not a possible value");
-
-        return;
-      }
-
       this.board[row][column].value = value;
 
       this.updateSuggestions();
@@ -153,6 +163,12 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.buttons {
+  display: flex;
+  justify-content: center;
+  margin: 2rem;
+}
+
 .wrapper {
   display: flex;
   justify-content: center;
@@ -200,6 +216,11 @@ export default defineComponent({
       &[data-column="5"],
       &[data-column="8"] {
         border-right: 2px solid black;
+      }
+
+      .final {
+        font-size: 2.5rem;
+        font-weight: bold;
       }
 
       .suggestions {
