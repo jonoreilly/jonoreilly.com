@@ -154,6 +154,14 @@ export default defineComponent({
 
       const value = valuesMap[$event.code];
 
+      // Avoid setting incorrect numbers
+      if (
+        value !== undefined &&
+        this.suggestionsBoard[row][column].value[value] !== true
+      ) {
+        return;
+      }
+
       this.board[row][column].value = value;
 
       this.updateSuggestions();
