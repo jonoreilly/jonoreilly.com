@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <input type="number" v-model="depth" @change="updateSuggestions()" />
+  <div style="margin: 20px">
+    <button @click="reset()">RESET</button>
   </div>
 
   <div class="wrapper">
@@ -12,11 +12,11 @@
             class="cell"
             :data-row="row"
             :data-column="column"
-            @keypress="onBoardCellChanged(row, column, $event)"
+            @keydown="onBoardCellChanged(row, column, $event)"
           >
-            <div v-if="board[row][column].value !== undefined">
+            <b v-if="board[row][column].value !== undefined">
               {{ board[row][column].value + 1 }}
-            </div>
+            </b>
 
             <div v-else class="suggestions">
               <div v-for="(_, s) in SIZE" :key="s">
@@ -37,38 +37,81 @@ import { createBoard } from "@/utils/projects/sudoku/board";
 import { getSuggestions, SIZE } from "@/utils/projects/sudoku/main";
 import { defineComponent } from "vue";
 
-const prefill = [
-  { row: 0, column: 0, value: 3 },
-  { row: 1, column: 2, value: 7 },
-  { row: 0, column: 4, value: 0 },
-  { row: 0, column: 5, value: 1 },
-  { row: 1, column: 4, value: 6 },
-  { row: 0, column: 6, value: 4 },
-];
+function getEmptyBoard() {
+  return createBoard<number | undefined>(SIZE, () => undefined);
+}
 
 export default defineComponent({
   data() {
-    const board = createBoard<number | undefined>(
-      SIZE,
-      (row, column) =>
-        prefill.find((el) => el.row === row && el.column === column)?.value
-    );
+    const board = getEmptyBoard();
 
     return {
       SIZE,
       board,
       suggestionsBoard: getSuggestions(board),
-      depth: 20,
     };
   },
 
   methods: {
     updateSuggestions() {
-      this.suggestionsBoard = getSuggestions(this.board, this.depth);
+      this.suggestionsBoard = getSuggestions(this.board);
+    },
+
+    reset() {
+      this.board = getEmptyBoard();
+
+      this.updateSuggestions();
     },
 
     onBoardCellChanged(row: number, column: number, $event: KeyboardEvent) {
-      // Keycode 49 = 1, 57 = 9
+      // Check arrows for movement
+      if (
+        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
+          $event.code
+        )
+      ) {
+        let nextRow = row;
+        let nextColumn = column;
+
+        switch ($event.code) {
+          case "ArrowUp":
+            if (nextRow > 0) {
+              nextRow--;
+            }
+
+            break;
+
+          case "ArrowDown":
+            if (nextRow < SIZE - 1) {
+              nextRow++;
+            }
+
+            break;
+
+          case "ArrowLeft":
+            if (nextColumn > 0) {
+              nextColumn--;
+            }
+
+            break;
+
+          case "ArrowRight":
+            if (nextColumn < SIZE - 1) {
+              nextColumn++;
+            }
+
+            break;
+        }
+
+        this.$el.parentElement
+          .querySelector(`[data-row="${nextRow}"][data-column="${nextColumn}"]`)
+          ?.focus();
+
+        return;
+      }
+
+      // Check values for input
+
       const valuesMap: Record<string, number> = {
         Digit1: 0,
         Digit2: 1,
@@ -129,8 +172,10 @@ export default defineComponent({
       justify-content: center;
       align-items: center;
 
-      &:focus {
+      &:focus,
+      &:focus-visible {
         background: lightblue;
+        outline: unset;
       }
 
       &[data-row="0"],
@@ -158,10 +203,13 @@ export default defineComponent({
       }
 
       .suggestions {
+        width: max-content;
+        height: max-content;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
         font-size: 0.7rem;
-        gap: 0.25rem;
+        gap: 0.2rem 0.5rem;
         color: gray;
       }
     }

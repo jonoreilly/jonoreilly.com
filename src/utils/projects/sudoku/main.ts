@@ -1,4 +1,4 @@
-import { Board, areSameBoards, createBoard } from "./board";
+import { Board, createBoard } from "./board";
 import { cellAnalisers } from "./analisers";
 
 const values = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -40,94 +40,58 @@ export function getFinalSuggestion(
   }
 }
 
-function areSameSuggestions(a: Suggestions, b: Suggestions) {
-  for (const value of values) {
-    if (a[value] !== b[value]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function evaluate(oldSuggestionsBoard: Board<Suggestions>, depth: number) {
+function evaluate(oldSuggestionsBoard: Board<Suggestions>) {
   const suggestionsBoard = createBoard(SIZE, (row, y) => [
     ...oldSuggestionsBoard[row][y].value,
   ]);
 
-  cellAnalisers
-    .filter((_, i) => i < depth)
-    .forEach((cellAnaliser) => {
-      for (let row = 0; row < SIZE; row++) {
-        for (let y = 0; y < SIZE; y++) {
-          // Skip filled in cells
-          if (
-            getFinalSuggestion(suggestionsBoard[row][y].value) !== undefined
-          ) {
-            continue;
-          }
+  for (const cellAnaliser of cellAnalisers) {
+    for (let row = 0; row < SIZE; row++) {
+      for (let column = 0; column < SIZE; column++) {
+        // Skip filled in cells
+        if (
+          getFinalSuggestion(suggestionsBoard[row][column].value) !== undefined
+        ) {
+          continue;
+        }
 
-          const resultSuggestions = cellAnaliser(suggestionsBoard, row, y);
+        const analiserResult = cellAnaliser(suggestionsBoard, row, column);
 
-          suggestionsBoard[row][y].value = resultSuggestions;
+        if (analiserResult.hasChanged) {
+          suggestionsBoard[row][column].value = analiserResult.suggestions;
+
+          return {
+            suggestionsBoard,
+            hasChanged: true,
+          };
         }
       }
-    });
+    }
+  }
 
-  return suggestionsBoard;
+  return {
+    suggestionsBoard,
+    hasChanged: false,
+  };
 }
 
 export function getSuggestions(
-  initialBoard: Board<number | undefined>,
-  suggestionDepth?: number
+  initialBoard: Board<number | undefined>
 ): Board<Suggestions> {
   let suggestionsBoard = createBoard(
     SIZE,
     getCreateInitialSuggestionsCallback(initialBoard)
   );
 
-  console.log("Start", { initialBoard, suggestionsBoard });
-
-  let evaluatorDepth = 1;
-
-  let passCount = 1;
-
   // eslint-disable-next-line no-constant-condition
-  while (suggestionDepth === undefined || passCount <= suggestionDepth) {
-    passCount++;
+  while (true) {
+    const evaluateResult = evaluate(suggestionsBoard);
 
-    const resultSuggestionsBoard = evaluate(suggestionsBoard, evaluatorDepth);
+    if (evaluateResult.hasChanged) {
+      suggestionsBoard = evaluateResult.suggestionsBoard;
 
-    console.log("After evaluate", {
-      passCount,
-      evaluatorDepth,
-      suggestionsBoard,
-      resultSuggestionsBoard,
-    });
-
-    if (
-      !areSameBoards(
-        suggestionsBoard,
-        resultSuggestionsBoard,
-        areSameSuggestions
-      )
-    ) {
-      evaluatorDepth = 1;
-      suggestionsBoard = resultSuggestionsBoard;
       continue;
     }
-
-    if (evaluatorDepth <= cellAnalisers.length) {
-      evaluatorDepth++;
-      continue;
-    }
-
-    console.log("Exit", {
-      passCount,
-      evaluatorDepth,
-      suggestionsBoard,
-      resultSuggestionsBoard,
-    });
 
     break;
   }
