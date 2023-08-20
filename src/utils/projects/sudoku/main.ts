@@ -10,7 +10,7 @@ type Value = (typeof values)[number];
 
 export type Suggestions = boolean[];
 
-function getCreateInitialSuggestionsCallback(
+export function getCreateInitialSuggestionsCallback(
   initialBoard: Board<number | undefined>
 ) {
   return (row: number, y: number) => {
